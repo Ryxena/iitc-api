@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
@@ -37,13 +35,13 @@ return new class extends Migration
     public function down()
     {
         DB::table('events')
-        ->where('name', 'IITC 2023')
-        ->where('description', 'iitc 2023')
-        ->delete();
+            ->where('name', 'IITC 2023')
+            ->where('description', 'iitc 2023')
+            ->delete();
 
-    // Set event_id back to NULL in competitions table
-    DB::table('competitions')
-        ->where('event_id', 1)
-        ->update(['event_id' => null]);
+        // Set event_id back to NULL in competitions table
+        DB::table('competitions')
+            ->where('event_id', 1)
+            ->update(['event_id' => null]);
     }
 };

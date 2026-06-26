@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\PaymentStatus;
 use App\Helpers\PaymentStatus as PaymentStatusHelper;
 use App\Http\Requests\StorePaymentRequest;
 use App\Models\Payment;
+use App\Models\PaymentStatus;
 use App\Models\Team;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
@@ -14,7 +14,7 @@ class PaymentController extends Controller
 {
     public function store(StorePaymentRequest $request, string $teamId): JsonResponse
     {
-        $this->authorize('create', [Payment::class, new Payment(), Team::query()->findOrFail($teamId)]);
+        $this->authorize('create', [Payment::class, new Payment, Team::query()->findOrFail($teamId)]);
         $team = Team::query()->findOrFail($teamId);
         $receiptUrl = $request->file('proveOfPayment')->store('receipt', ['disk' => 'public']);
         $paymentData = [
@@ -40,7 +40,7 @@ class PaymentController extends Controller
                     'teamId' => $teamId,
                 ],
                 'payment' => $payment,
-            ]
+            ],
         ];
 
         return response()->json($responseData);

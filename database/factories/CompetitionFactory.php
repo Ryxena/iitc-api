@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\Competition;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Competition>
+ * @extends Factory<Competition>
  */
 class CompetitionFactory extends Factory
 {
@@ -23,7 +24,7 @@ class CompetitionFactory extends Factory
             'price' => fake()->numerify('#####'),
             'description' => fake()->text(250),
             'guide_book' => fake()->imageUrl,
-            'cover' => fake()->imageUrl
+            'cover' => fake()->imageUrl,
         ];
     }
 }

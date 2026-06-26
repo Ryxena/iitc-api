@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Helpers\Gender;
 use App\Helpers\Grade;
+use App\Models\Participant;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Participant>
+ * @extends Factory<Participant>
  */
 class ParticipantFactory extends Factory
 {
@@ -20,6 +21,7 @@ class ParticipantFactory extends Factory
     {
         $isStudent = fake()->boolean;
         $isMale = fake()->boolean;
+
         return [
             'grade' => $isStudent ? Grade::STUDENT : Grade::COLLEGE_STUDENT,
             'institution' => fake()->company,

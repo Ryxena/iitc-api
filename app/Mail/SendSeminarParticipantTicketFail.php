@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -14,7 +13,9 @@ class SendSeminarParticipantTicketFail extends Mailable
     use Queueable, SerializesModels;
 
     protected $email;
+
     protected $name;
+
     protected $reason;
 
     /**
@@ -32,7 +33,7 @@ class SendSeminarParticipantTicketFail extends Mailable
     /**
      * Get the message envelope.
      *
-     * @return \Illuminate\Mail\Mailables\Envelope
+     * @return Envelope
      */
     public function envelope()
     {
@@ -44,7 +45,7 @@ class SendSeminarParticipantTicketFail extends Mailable
     /**
      * Get the message content definition.
      *
-     * @return \Illuminate\Mail\Mailables\Content
+     * @return Content
      */
     public function content()
     {
@@ -53,7 +54,7 @@ class SendSeminarParticipantTicketFail extends Mailable
             with: [
                 'participantName' => $this->name,
                 'participantEmail' => $this->email,
-                'reason' => $this->reason
+                'reason' => $this->reason,
             ],
         );
     }

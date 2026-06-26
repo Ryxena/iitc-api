@@ -14,10 +14,10 @@ class RegisterController extends Controller
     public function store(StoreRegisterRequest $request): JsonResponse
     {
         $data = [
-            "name" => $request->fullName,
-            "email" => $request->email,
-            "password" => $request->password,
-            "phone" => $request->phone,
+            'name' => $request->fullName,
+            'email' => $request->email,
+            'password' => $request->password,
+            'phone' => $request->phone,
         ];
         $user = User::query()->create($data);
         $user->assignRole('User');
@@ -39,13 +39,13 @@ class RegisterController extends Controller
         $hash = sha1($user->email);
 
         $responseData = [
-            "status" => 1,
-            "message" => "Success register & check email for verify",
-            "data" => [
-                "user" => [
-                    "id" => $user->id,
-                    "fullName" => $user->name,
-                    "email" => $user->email,
+            'status' => 1,
+            'message' => 'Success register & check email for verify',
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'fullName' => $user->name,
+                    'email' => $user->email,
                 ],
                 'verifyEmail' => [
                     'id' => $user->id,

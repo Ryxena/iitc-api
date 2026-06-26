@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\Payment;
 use App\Models\Team;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class PaymentPolicy
 {

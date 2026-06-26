@@ -11,6 +11,7 @@ class Payment extends Model
     use HasFactory;
 
     protected $primaryKey = 'team_id';
+
     public $incrementing = false;
 
     protected $guarded = [];

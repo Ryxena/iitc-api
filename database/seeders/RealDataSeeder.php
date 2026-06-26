@@ -34,35 +34,35 @@ class RealDataSeeder extends Seeder
         $superAdmin = User::factory()->create([
             'name' => 'Super Admin',
             'email' => 'superadmin@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $superAdmin->assignRole('Super Admin');
 
         $admin = User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $admin->assignRole('Admin');
 
         $user = User::factory()->create([
             'name' => 'User',
             'email' => 'user@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $user->assignRole('User');
 
         $member = User::factory()->create([
             'name' => 'Member',
             'email' => 'member@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $member->assignRole('User');
 
         $notMember = User::factory()->create([
             'name' => 'Not Member',
             'email' => 'notmember@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $notMember->assignRole('User');
 

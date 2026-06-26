@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\CategoryCompetition;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class CategoryCompetitionSeeder extends Seeder

@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -17,7 +16,7 @@ class EventPermissionSeeder extends Seeder
     private array $pluralActions = ['List'];
 
     private array $singularActions = [
-        'View', 'Create', 'Update', 'Delete', 'Restore', 'Force Delete'
+        'View', 'Create', 'Update', 'Delete', 'Restore', 'Force Delete',
     ];
 
     /**

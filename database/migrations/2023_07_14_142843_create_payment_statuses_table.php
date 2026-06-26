@@ -19,7 +19,7 @@ return new class extends Migration
                 [
                     PaymentStatus::INVALID,
                     PaymentStatus::PENDING,
-                    PaymentStatus::VALID
+                    PaymentStatus::VALID,
                 ]
             )
                 ->default(PaymentStatus::PENDING);

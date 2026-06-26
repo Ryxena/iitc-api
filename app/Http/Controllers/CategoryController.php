@@ -49,7 +49,6 @@ class CategoryController extends Controller
         $this->authorize('update', Category::query()->findOrFail($categoryId));
         $competitionCategory = Category::where('id', $categoryId)->firstOrFail();
 
-
         $data = [
             'name' => $request->name,
         ];

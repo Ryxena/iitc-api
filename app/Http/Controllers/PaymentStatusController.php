@@ -10,10 +10,9 @@ use Illuminate\Http\JsonResponse;
 
 class PaymentStatusController extends Controller
 {
-
     public function update(UpdatePaymentStatusRequest $request, string $teamId): JsonResponse
     {
-        $this->authorize('update', [PaymentStatus::class, new PaymentStatus()]);
+        $this->authorize('update', [PaymentStatus::class, new PaymentStatus]);
         $team = Team::query()->findOrFail($teamId);
 
         $paymentStatusData = [
@@ -35,8 +34,8 @@ class PaymentStatusController extends Controller
                     'team_id' => $teamId,
                     'status' => $paymentStatus->status,
                     'reason' => $paymentStatus->reason,
-                ]
-            ]
+                ],
+            ],
         ];
 
         return response()->json($responseData);

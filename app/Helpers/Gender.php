@@ -2,7 +2,9 @@
 
 namespace App\Helpers;
 
-class Gender {
+class Gender
+{
     const MALE = 'male';
+
     const FEMALE = 'female';
 }

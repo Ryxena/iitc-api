@@ -1,8 +1,6 @@
 <?php
 
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -23,7 +21,7 @@ return new class extends Migration
         $pluralActions = ['List'];
 
         $singularActions = [
-            'View', 'Create', 'Update', 'Delete', 'Restore', 'Force Delete'
+            'View', 'Create', 'Update', 'Delete', 'Restore', 'Force Delete',
         ];
 
         foreach ($modules as $module) {
@@ -89,7 +87,7 @@ return new class extends Migration
             'Delete Event',
             'Restore Event',
             'Force Delete Event',
-            'List Events'
+            'List Events',
         ])->delete();
     }
 };

@@ -7,29 +7,29 @@ use App\Http\Controllers\Controller;
 use App\Models\Competition;
 use App\Models\Event;
 use App\Models\Team;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Database\Eloquent\Builder;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class TeamController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->hasRole('Admin')) {
+        if (! auth()->user()->hasRole('Admin')) {
             throw new AccessDeniedHttpException('unauthorize');
         }
 
         $eventActive = Event::query()->where('is_active', true)->first();
         $competitionIds = Competition::query()->where('event_id', $eventActive->id)->pluck('id');
         $queryTeams = Team::query()
-        ->whereIn('competition_id', $competitionIds)
-        ->whereHas('paymentStatus', function (Builder $query) {
-            $query->where('status', '=', 'VALID');
-        })
-        ->withCount('members')
-        ->with([
-            'competition',
-            'leader',
-        ])->get();
+            ->whereIn('competition_id', $competitionIds)
+            ->whereHas('paymentStatus', function (Builder $query) {
+                $query->where('status', '=', 'VALID');
+            })
+            ->withCount('members')
+            ->with([
+                'competition',
+                'leader',
+            ])->get();
 
         $teams = [];
         foreach ($queryTeams as $team) {
@@ -49,7 +49,7 @@ class TeamController extends Controller
 
     public function show(string $teamId)
     {
-        if (!auth()->user()->hasRole('Admin')) {
+        if (! auth()->user()->hasRole('Admin')) {
             throw new AccessDeniedHttpException('unauthorize');
         }
 
@@ -60,7 +60,7 @@ class TeamController extends Controller
             'leader.participant:avatar',
             'members:id,name,email',
             'members.participant:user_id,avatar',
-            'competition'
+            'competition',
         ])->findOrFail($teamId);
         $paymentStatus = isset($team->payment) ? PaymentStatus::PENDING : null;
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
@@ -112,4 +112,3 @@ class TeamController extends Controller
         ];
     }
 }
-

@@ -2,8 +2,11 @@
 
 namespace App\Helpers;
 
-class PaymentStatus {
+class PaymentStatus
+{
     const INVALID = 'INVALID';
+
     const PENDING = 'PENDING';
+
     const VALID = 'VALID';
 }

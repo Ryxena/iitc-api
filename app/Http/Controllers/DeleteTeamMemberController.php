@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Member;
 use App\Models\Team;
 use App\Models\User;
-use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class DeleteTeamMemberController extends Controller
 {

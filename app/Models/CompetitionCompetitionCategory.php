@@ -21,5 +21,4 @@ class CompetitionCompetitionCategory extends Model
     {
         return $this->belongsTo(CompetitionCategory::class, 'competition_category__id');
     }
-
 }

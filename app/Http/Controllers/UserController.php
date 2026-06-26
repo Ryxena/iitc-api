@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UserController extends Controller
 {
@@ -24,7 +24,7 @@ class UserController extends Controller
 
         return response()->json($responseData);
     }
-    
+
     public function show(): JsonResponse
     {
         // $this->authorize('viewAny', User::class);
@@ -49,15 +49,15 @@ class UserController extends Controller
             $user->delete();
 
             $responseData = [
-                "status" => 1,
-                "message" => "User berhasil dihapus",
+                'status' => 1,
+                'message' => 'User berhasil dihapus',
             ];
 
             return response()->json($responseData);
         } catch (ModelNotFoundException $exception) {
             $responseData = [
-                "status" => 0,
-                "message" => "User tidak ada",
+                'status' => 0,
+                'message' => 'User tidak ada',
             ];
 
             return response()->json($responseData, 404);

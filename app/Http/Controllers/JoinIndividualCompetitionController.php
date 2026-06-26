@@ -7,7 +7,6 @@ use App\Models\Competition;
 use App\Models\Team;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class JoinIndividualCompetitionController extends Controller
 {
@@ -27,9 +26,9 @@ class JoinIndividualCompetitionController extends Controller
                 'message' => 'Succeed joined competition',
                 'data' => [
                     'team' => [
-                        'id' => $team->id
-                    ]
-                ]
+                        'id' => $team->id,
+                    ],
+                ],
             ];
 
             return response()->json($responseData, 200);

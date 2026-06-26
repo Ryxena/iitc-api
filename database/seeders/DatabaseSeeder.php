@@ -22,42 +22,42 @@ class DatabaseSeeder extends Seeder
         $superAdmin = User::factory()->create([
             'name' => 'Super Admin',
             'email' => 'superadmin@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $superAdmin->assignRole('Super Admin');
 
         $admin = User::factory()->create([
             'name' => 'Admin',
             'email' => 'admin@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $admin->assignRole('Admin');
 
         $user = User::factory()->create([
             'name' => 'User',
             'email' => 'user@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $user->assignRole('User');
 
         $member = User::factory()->create([
             'name' => 'User',
             'email' => 'member@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $member->assignRole('User');
 
         $notMember = User::factory()->create([
             'name' => 'User',
             'email' => 'notmember@gmail.com',
-            'password' => 'myPassword'
+            'password' => 'myPassword',
         ]);
         $notMember->assignRole('User');
 
         $this->call([
             CategorySeeder::class,
             CompetitionSeeder::class,
-            CategoryCompetitionSeeder::class
+            CategoryCompetitionSeeder::class,
         ]);
 
         $users = User::factory(100)->create();
@@ -71,8 +71,8 @@ class DatabaseSeeder extends Seeder
 
         $members = User::factory(300)->create();
         $memberIndex = 0;
-        for ($i=1; $i <= 100; $i++) {
-            for ($j=0; $j < 3; $j++) {
+        for ($i = 1; $i <= 100; $i++) {
+            for ($j = 0; $j < 3; $j++) {
                 Member::factory()->create([
                     'team_id' => $i,
                     'user_id' => $members[$memberIndex]->id,

@@ -3,19 +3,19 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Support\Facades\Log;
 
 class SendsPasswordResetEmails extends Mailable
 {
     use Queueable, SerializesModels;
 
     private $tokenResetPassword;
+
     private $receiverName;
+
     private $receiverEmail;
 
     /**
@@ -33,7 +33,7 @@ class SendsPasswordResetEmails extends Mailable
     /**
      * Get the message envelope.
      *
-     * @return \Illuminate\Mail\Mailables\Envelope
+     * @return Envelope
      */
     public function envelope()
     {
@@ -45,11 +45,12 @@ class SendsPasswordResetEmails extends Mailable
     /**
      * Get the message content definition.
      *
-     * @return \Illuminate\Mail\Mailables\Content
+     * @return Content
      */
     public function content()
     {
-        $resetLink = config('app.web_url') . "/reset-password?token=" . $this->tokenResetPassword . "&email=" . $this->receiverEmail;
+        $resetLink = config('app.web_url').'/reset-password?token='.$this->tokenResetPassword.'&email='.$this->receiverEmail;
+
         return new Content(
             view: 'mails.send_password_reset_email',
             with: [

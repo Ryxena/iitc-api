@@ -5,9 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePasswordResetLinkRequest;
 use App\Mail\SendsPasswordResetEmails;
 use App\Models\User;
-use Illuminate\Auth\Passwords\TokenRepositoryInterface;
-use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PasswordResetLinkController extends Controller
@@ -16,16 +15,16 @@ class PasswordResetLinkController extends Controller
     {
         $user = User::where('email', $request->email)->first();
         if ($user == null) {
-            throw new NotFoundHttpException("email tidak ada");
+            throw new NotFoundHttpException('email tidak ada');
         }
         $token = Password::broker()->createToken($user);
         Mail::to($user)->queue(new SendsPasswordResetEmails($token, $user->name, $user->email));
 
         $responseData = [
-            "status" => 1,
-            "message" => "Success request link reset password",
-            "data" => [
-                "token_reset_password" => $token,
+            'status' => 1,
+            'message' => 'Success request link reset password',
+            'data' => [
+                'token_reset_password' => $token,
             ],
         ];
 

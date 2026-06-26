@@ -2,8 +2,11 @@
 
 namespace App\Helpers;
 
-class Grade {
+class Grade
+{
     const STUDENT = 'pelajar';
+
     const COLLEGE_STUDENT = 'mahasiswa';
+
     const PUBLIC = 'umum';
 }

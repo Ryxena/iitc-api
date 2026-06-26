@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Helpers\PaymentStatus;
 use App\Models\Team;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class AdminGetDetailTeamController extends Controller
 {

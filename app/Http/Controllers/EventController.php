@@ -84,7 +84,8 @@ class EventController extends Controller
         return response()->json($responseData, 200);
     }
 
-    public function changeIsActive(string $eventId): JsonResponse {
+    public function changeIsActive(string $eventId): JsonResponse
+    {
         $this->authorize('update', Event::query()->where('id', $eventId)->firstOrFail());
 
         Event::query()->where('id', '!=', $eventId)->update(['is_active' => 0]);

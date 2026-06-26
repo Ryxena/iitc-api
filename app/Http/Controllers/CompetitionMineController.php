@@ -7,7 +7,6 @@ use App\Models\Team;
 use App\Models\User;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class CompetitionMineController extends Controller
 {

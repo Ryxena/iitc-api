@@ -21,7 +21,7 @@ class CompetitionController extends Controller
     {
         $event = Event::query()->where('is_active', true)->first();
         if ($event == null) {
-            throw new ModelNotFoundException("event not found");
+            throw new ModelNotFoundException('event not found');
         }
         $competitions = Competition::query()
             ->where('event_id', $event->id)
@@ -29,9 +29,10 @@ class CompetitionController extends Controller
             ->get()->map(function (Competition $competition) {
                 $categories = $competition->categories->map(function (Category $category) {
                     return [
-                        'name' => $category->name
+                        'name' => $category->name,
                     ];
                 });
+
                 return [
                     'slug' => $competition->slug,
                     'name' => $competition->name,
@@ -117,7 +118,7 @@ class CompetitionController extends Controller
         $result = Competition::with([
             'criteria:id,competition_id,name,percentage',
             'techStacks:id,competition_id,name',
-            'categories' => fn($query) => $query->select('name'),
+            'categories' => fn ($query) => $query->select('name'),
         ])
             ->where('slug', $slug)
             ->firstOrFail();
@@ -126,9 +127,9 @@ class CompetitionController extends Controller
         $now = Carbon::now();
         $days = $deadline->diffInDays($now);
 
-        $techStacks = $result->techStacks->map(fn($item) => $item->name);
-        $categories = $result->categories->map(fn($item) => ['name' => $item->name]);
-        $criteria = $result->criteria->map(fn($item) => ['name' => $item->name, 'percentage' => $item->percentage]);
+        $techStacks = $result->techStacks->map(fn ($item) => $item->name);
+        $categories = $result->categories->map(fn ($item) => ['name' => $item->name]);
+        $criteria = $result->criteria->map(fn ($item) => ['name' => $item->name, 'percentage' => $item->percentage]);
 
         $competition = [
             'name' => $result->name,

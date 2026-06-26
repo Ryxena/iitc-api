@@ -10,7 +10,6 @@ use App\Models\Event;
 use App\Models\Team;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class TeamController extends Controller
 {
@@ -25,7 +24,7 @@ class TeamController extends Controller
                 'paymentStatus',
                 'payment',
                 'leader',
-                'competition'
+                'competition',
             ])->get();
         $teamsResponse = [];
         foreach ($teams as $team) {
@@ -95,7 +94,7 @@ class TeamController extends Controller
             'leader.participant:avatar',
             'members:id,name,email',
             'members.participant:user_id,avatar',
-            'competition'
+            'competition',
         ])->findOrFail($teamId);
         $paymentStatus = isset($team->payment) ? PaymentStatus::PENDING : null;
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;

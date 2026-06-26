@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Exceptions\LeaderJoinOwnTeamException;
 use App\Http\Requests\StoreJoinTeamRequest;
-use App\Models\Member;
 use App\Models\Team;
 use Exception;
 use Illuminate\Http\JsonResponse;

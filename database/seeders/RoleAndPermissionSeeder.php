@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
@@ -11,13 +10,13 @@ use Spatie\Permission\Models\Role;
 class RoleAndPermissionSeeder extends Seeder
 {
     private array $modules = [
-        'Category', 'Competition', 'Team', 'Participant', 'Payment', 'Payment Status', 'User'
+        'Category', 'Competition', 'Team', 'Participant', 'Payment', 'Payment Status', 'User',
     ];
 
     private array $pluralActions = ['List'];
 
     private array $singularActions = [
-        'View', 'Create', 'Update', 'Delete', 'Restore', 'Force Delete'
+        'View', 'Create', 'Update', 'Delete', 'Restore', 'Force Delete',
     ];
 
     public function run(): void
@@ -41,7 +40,7 @@ class RoleAndPermissionSeeder extends Seeder
             }
         }
         Permission::firstOrCreate([
-            'name' => "Detail Payment Team",
+            'name' => 'Detail Payment Team',
             'guard_name' => 'web',
         ]);
 

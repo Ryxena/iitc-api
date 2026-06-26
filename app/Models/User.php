@@ -16,7 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable, HasUuids, HasRoles, HashingPassword;
+    use HasApiTokens, HasFactory, HashingPassword, HasRoles, HasUuids, Notifiable;
 
     protected $guarded = [];
 
@@ -61,7 +61,7 @@ class User extends Authenticatable implements MustVerifyEmail
         return $isMember != null;
     }
 
-        public function payment(): HasOne
+    public function payment(): HasOne
     {
         return $this->hasOne(PaymentSeminar::class);
     }
@@ -70,6 +70,4 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(PaymentSeminarStatus::class);
     }
-    
-
 }
