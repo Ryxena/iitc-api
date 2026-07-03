@@ -23,6 +23,8 @@ class TeamFactory extends Factory
             'code' => fake()->bothify('??##??##'),
             'avatar' => fake()->imageUrl,
             'submission' => fake()->imageUrl,
+            'leader_id' => \App\Models\User::factory(),
+            'competition_id' => \App\Models\Competition::factory(),
         ];
     }
 }

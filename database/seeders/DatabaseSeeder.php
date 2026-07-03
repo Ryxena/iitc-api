@@ -58,34 +58,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             CompetitionSeeder::class,
             CategoryCompetitionSeeder::class,
+            DummyDataSeeder::class,
         ]);
-
-        $users = User::factory(100)->create();
-        foreach ($users as $user) {
-            $user->assignRole('User');
-            Team::factory()->create([
-                'leader_id' => $user->id,
-                'competition_id' => fake()->numberBetween(1, 10),
-            ]);
-        }
-
-        $members = User::factory(300)->create();
-        $memberIndex = 0;
-        for ($i = 1; $i <= 100; $i++) {
-            for ($j = 0; $j < 3; $j++) {
-                Member::factory()->create([
-                    'team_id' => $i,
-                    'user_id' => $members[$memberIndex]->id,
-                ]);
-                $members[$memberIndex]->assignRole('User');
-                $memberIndex++;
-            }
-        }
-
-        foreach ($members as $member) {
-            Participant::factory()->create([
-                'user_id' => $member->id,
-            ]);
-        }
     }
 }

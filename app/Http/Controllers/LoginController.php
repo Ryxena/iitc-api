@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\AuthenticationException;
+use Illuminate\Auth\AuthenticationException;
 use App\Http\Requests\StoreLoginRequest;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
