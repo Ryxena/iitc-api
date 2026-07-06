@@ -7,7 +7,6 @@ use App\Http\Requests\StoreJoinTeamRequest;
 use App\Models\Team;
 use Exception;
 use Illuminate\Http\JsonResponse;
-use Spatie\FlareClient\Http\Exceptions\NotFound;
 
 class JoinTeamController extends Controller
 {
@@ -18,31 +17,36 @@ class JoinTeamController extends Controller
             $team = Team::query()->where('code', $code)->firstOrFail();
             $user = auth()->user();
 
-            // code not found
-            if ($code != $team->code) {
-                throw new NotFound('team code not found');
+            // leader joined his own team
+            if ($team->leader_id === $user->id) {
+                throw new LeaderJoinOwnTeamException('you are the leader!');
             }
 
-            // leader joined his own team
-            if ($team->leader_id == $user->id) {
-                throw new LeaderJoinOwnTeamException('you are the leader!');
+            // Business validation: Check if user is already in a team for this competition
+            $hasTeamInCompetition = Team::query()->where('competition_id', $team->competition_id)
+                ->where(function ($query) use ($user) {
+                    $query->where('leader_id', $user->id)
+                        ->orWhereHas('members', function ($q) use ($user) {
+                            $q->where('user_id', $user->id);
+                        });
+                })->exists();
+                
+            if ($hasTeamInCompetition) {
+                return $this->error('You are already a member or leader of a team in this competition.', 400);
+            }
+
+            // Business validation: Check team capacity (leader is +1, so total members is members_count + 1)
+            $team->loadCount('members');
+            $maxMembers = $team->competition->max_members;
+            if (($team->members_count + 1) >= $maxMembers) {
+                return $this->error('The team has already reached its maximum capacity.', 400);
             }
 
             $user->asMembers()->syncWithoutDetaching($team->id);
 
-            $responseData = [
-                'status' => 1,
-                'message' => 'Succeed joined a team',
-            ];
-
-            return response()->json($responseData, 200);
+            return $this->success('Succeed joined a team');
         } catch (Exception $exception) {
-            $responseData = [
-                'status' => 0,
-                'message' => $exception->getMessage(),
-            ];
-
-            return response()->json($responseData, 400);
+            return $this->error($exception->getMessage(), 400);
         }
     }
 }

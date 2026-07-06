@@ -19,6 +19,10 @@ class TeamController extends Controller
         }
 
         $eventActive = Event::query()->where('is_active', true)->first();
+        if (! $eventActive) {
+            return $this->error('No active event found.', 404);
+        }
+
         $competitionIds = Competition::query()->where('event_id', $eventActive->id)->pluck('id');
         $queryTeams = Team::query()
             ->whereIn('competition_id', $competitionIds)
@@ -36,15 +40,7 @@ class TeamController extends Controller
             $teams[] = $this->transformDBToResponseTeam($team);
         }
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed get all competition',
-            'data' => [
-                'teams' => $teams,
-            ],
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed get all competition.', ['teams' => $teams]);
     }
 
     public function show(string $teamId)
@@ -62,53 +58,47 @@ class TeamController extends Controller
             'members.participant:user_id,avatar',
             'competition',
         ])->findOrFail($teamId);
+        
         $paymentStatus = isset($team->payment) ? PaymentStatus::PENDING : null;
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
+        
         $teamResponse = [
-            'id' => $team->id,
-            'name' => $team->name,
-            'code' => $team->code,
-            'title' => $team->title,
+            'id'       => $team->id,
+            'name'     => $team->name,
+            'code'     => $team->code,
+            'title'    => $team->title,
             'isActive' => $paymentStatus,
             'isSubmit' => isset($team->submission),
-            'avatar' => $team->avatar,
-            'leader' => [
-                'name' => $team->leader->name,
-                'email' => $team->leader->email,
+            'avatar'   => $team->avatar,
+            'leader'   => [
+                'name'   => $team->leader->name,
+                'email'  => $team->leader->email,
                 'avatar' => $team->leader->participant->avatar ?? null,
             ],
-            'members' => $team->members,
+            'members'  => $team->members,
         ];
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed get detail team',
-            'data' => [
-                'team' => $teamResponse,
-            ],
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed get detail team.', ['team' => $teamResponse]);
     }
 
     private function transformDBToResponseTeam(Team $team): array
     {
         return [
-            'teamId' => $team->id,
+            'teamId'          => $team->id,
             'competitionName' => $team->competition->name,
-            'cSlug' => $team->competition->slug,
-            'teamName' => $team->name,
-            'avatar' => $team->avatar,
-            'isSubmit' => isset($team->submission),
-            'maxMembers' => $team->competition->max_members,
-            'currentMembers' => $team->members_count,
-            'leader' => [
-                'name' => $team->leader->name,
-                'phone' => $team->leader->phone,
-                'email' => $team->leader->email,
+            'cSlug'           => $team->competition->slug,
+            'teamName'        => $team->name,
+            'avatar'          => $team->avatar,
+            'isSubmit'        => isset($team->submission),
+            'maxMembers'      => $team->competition->max_members,
+            'currentMembers'  => $team->members_count,
+            'leader'          => [
+                'name'    => $team->leader->name,
+                'phone'   => $team->leader->phone,
+                'email'   => $team->leader->email,
                 'address' => $team->leader->participant->institution ?? null,
             ],
-            'submission' => $team->submission,
+            'submission'      => $team->submission,
         ];
     }
 }

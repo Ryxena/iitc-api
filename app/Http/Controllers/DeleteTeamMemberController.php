@@ -11,8 +11,9 @@ class DeleteTeamMemberController extends Controller
 {
     public function __invoke(string $teamId, string $memberId): JsonResponse
     {
-        $this->authorize('delete', Team::query()->find($teamId));
         $team = Team::query()->findOrFail($teamId);
+        $this->authorize('delete', $team);
+
         $member = User::query()->findOrFail($memberId);
 
         Member::query()->where('team_id', $team->id)
@@ -21,15 +22,9 @@ class DeleteTeamMemberController extends Controller
 
         $member->asMembers()->detach($team->id);
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed delete user from team',
-            'data' => [
-                'teamId' => $teamId,
-                'memberId' => $memberId,
-            ],
-        ];
-
-        return response()->json($responseData, 201);
+        return $this->success('Succeed delete user from team', [
+            'teamId'   => $teamId,
+            'memberId' => $memberId,
+        ]);
     }
 }

@@ -5,29 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StorePasswordResetLinkRequest;
 use App\Mail\SendsPasswordResetEmails;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PasswordResetLinkController extends Controller
 {
-    public function store(StorePasswordResetLinkRequest $request)
+    public function store(StorePasswordResetLinkRequest $request): JsonResponse
     {
         $user = User::where('email', $request->email)->first();
-        if ($user == null) {
-            throw new NotFoundHttpException('email tidak ada');
+        if ($user === null) {
+            return $this->error('email tidak ada', 404);
         }
         $token = Password::broker()->createToken($user);
         Mail::to($user)->queue(new SendsPasswordResetEmails($token, $user->name, $user->email));
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Success request link reset password',
-            'data' => [
-                'token_reset_password' => $token,
-            ],
-        ];
-
-        return response()->json($responseData);
+        return $this->success('Success request link reset password', [
+            'token_reset_password' => $token,
+        ]);
     }
 }

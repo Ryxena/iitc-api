@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreRegisterRequest;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Config;
@@ -14,19 +15,21 @@ class RegisterController extends Controller
     public function store(StoreRegisterRequest $request): JsonResponse
     {
         $data = [
-            'name' => $request->fullName,
-            'email' => $request->email,
+            'name'     => $request->fullName,
+            'email'    => $request->email,
             'password' => $request->password,
-            'phone' => $request->phone,
+            'phone'    => $request->phone,
         ];
         $user = User::query()->create($data);
         $user->assignRole('User');
+
+        event(new Registered($user));
 
         $url = URL::temporarySignedRoute(
             'verification.verify',
             Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60)),
             [
-                'id' => $user->id,
+                'id'   => $user->id,
                 'hash' => sha1($user->email),
             ]
         );
@@ -38,24 +41,18 @@ class RegisterController extends Controller
         $expire = Carbon::now()->addMinutes(Config::get('auth.verification.expire', 60))->timestamp;
         $hash = sha1($user->email);
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Success register & check email for verify',
-            'data' => [
-                'user' => [
-                    'id' => $user->id,
-                    'fullName' => $user->name,
-                    'email' => $user->email,
-                ],
-                'verifyEmail' => [
-                    'id' => $user->id,
-                    'hash' => $hash,
-                    'expires' => $expire,
-                    'signature' => $signature,
-                ],
+        return $this->success('Success register & check email for verify', [
+            'user' => [
+                'id'       => $user->id,
+                'fullName' => $user->name,
+                'email'    => $user->email,
             ],
-        ];
-
-        return response()->json($responseData, 201);
+            'verifyEmail' => [
+                'id'        => $user->id,
+                'hash'      => $hash,
+                'expires'   => $expire,
+                'signature' => $signature,
+            ],
+        ], 201);
     }
 }

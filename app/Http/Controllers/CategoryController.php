@@ -13,74 +13,47 @@ class CategoryController extends Controller
     {
         $categories = Category::all();
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed gel all competition categories',
-            'data' => [
-                'categories' => $categories,
-            ],
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed get all competition categories.', [
+            'categories' => $categories,
+        ]);
     }
 
     public function store(StoreCategoryRequest $request): JsonResponse
     {
         $this->authorize('create', Category::class);
-        $data = [
+        
+        $category = Category::query()->create([
             'name' => $request->name,
-        ];
+        ]);
 
-        $category = Category::query()->create($data);
-
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed create new competition category',
-            'data' => [
-                'category' => $category,
-            ],
-        ];
-
-        return response()->json($responseData, 201);
+        return $this->success('Succeed create new competition category.', [
+            'category' => $category,
+        ], 201);
     }
 
     public function update(UpdateCategoryRequest $request, string $categoryId): JsonResponse
     {
-        $this->authorize('update', Category::query()->findOrFail($categoryId));
-        $competitionCategory = Category::where('id', $categoryId)->firstOrFail();
+        $competitionCategory = Category::query()->findOrFail($categoryId);
+        $this->authorize('update', $competitionCategory);
 
-        $data = [
+        $competitionCategory->update([
             'name' => $request->name,
-        ];
+        ]);
 
-        $competitionCategory->update($data);
-
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed update competition category',
-            'data' => [
-                'category' => $competitionCategory,
-            ],
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed update competition category.', [
+            'category' => $competitionCategory,
+        ]);
     }
 
     public function destroy(string $categoryId): JsonResponse
     {
-        $this->authorize('delete', Category::query()->findOrFail($categoryId));
-        $competitionCategory = Category::where('id', $categoryId)->firstOrFail();
+        $competitionCategory = Category::query()->findOrFail($categoryId);
+        $this->authorize('delete', $competitionCategory);
 
         $competitionCategory->delete();
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed delete competition category',
-            'data' => [
-                'category' => $competitionCategory,
-            ],
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed delete competition category.', [
+            'category' => $competitionCategory,
+        ]);
     }
 }

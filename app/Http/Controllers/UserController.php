@@ -14,31 +14,9 @@ class UserController extends Controller
         $this->authorize('viewAny', User::class);
         $users = User::query()->role('User')->with('participant')->get();
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'success get all users',
-            'data' => [
-                'users' => $users,
-            ],
-        ];
-
-        return response()->json($responseData);
-    }
-
-    public function show(): JsonResponse
-    {
-        // $this->authorize('viewAny', User::class);
-        $users = User::query()->role('User')->with('participant')->get();
-
-        $responseData = [
-            'status' => 1,
-            'message' => 'success get all users',
-            'data' => [
-                'users' => $users,
-            ],
-        ];
-
-        return response()->json($responseData);
+        return $this->success('success get all users', [
+            'users' => $users,
+        ]);
     }
 
     public function destroy(Request $request, string $userId): JsonResponse
@@ -48,19 +26,9 @@ class UserController extends Controller
             $this->authorize('delete', $user);
             $user->delete();
 
-            $responseData = [
-                'status' => 1,
-                'message' => 'User berhasil dihapus',
-            ];
-
-            return response()->json($responseData);
+            return $this->success('User berhasil dihapus');
         } catch (ModelNotFoundException $exception) {
-            $responseData = [
-                'status' => 0,
-                'message' => 'User tidak ada',
-            ];
-
-            return response()->json($responseData, 404);
+            return $this->error('User tidak ada', 404);
         }
     }
 }

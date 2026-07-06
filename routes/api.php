@@ -22,72 +22,74 @@ use App\Http\Controllers\SeminarController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerifyEmailController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
 |--------------------------------------------------------------------------
 | API Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
 */
+
+// ============================================================
+// PUBLIC ROUTES (No Authentication Required)
+// ============================================================
+
+Route::get('/', fn () => 'ok! @iitc');
 
 Route::get('/debug-sentry', function () {
     throw new Exception('My first Sentry error!');
 });
 
-Route::get('', fn () => 'ok! @iitc');
-
-Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
+Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
     ->middleware(['signed', 'throttle:6,1'])
     ->name('verification.verify');
+
+Route::post('/login', [LoginController::class, 'store'])->name('login');
+Route::post('/register', [RegisterController::class, 'store'])->name('register');
+Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
+Route::post('/reset-password', [NewPasswordController::class, 'store']);
+
+// Competitions (public read)
+// NOTE: 'competitions/mine' must be declared BEFORE '{slug}' to avoid wildcard conflict
+Route::get('/competitions', [CompetitionController::class, 'index']);
+Route::get('/competitions/categories', [CategoryController::class, 'index']);
+Route::get('/competitions/mine', CompetitionMineController::class)->middleware(['auth:sanctum', 'verified']);
+Route::get('/competitions/{slug}', [CompetitionController::class, 'show']);
+
+// ============================================================
+// AUTHENTICATED ROUTES (auth:sanctum only)
+// ============================================================
+
 Route::middleware('auth:sanctum')->group(function () {
-    Route::post('logout', [LogoutController::class, 'store']);
+    Route::post('/logout', [LogoutController::class, 'store']);
 });
 
+// ============================================================
+// AUTHENTICATED + VERIFIED ROUTES (auth:sanctum + verified)
+// ============================================================
+
 Route::middleware(['auth:sanctum', 'verified'])->group(function () {
-    Route::post('competitions/categories', [CategoryController::class, 'store']);
 
-    Route::prefix('competitions/categories/{categoryId}')->group(function () {
-        Route::put('', [CategoryController::class, 'update']);
-        Route::delete('', [CategoryController::class, 'destroy']);
+    // ----------------------------------------------------------
+    // ADMIN ROUTES
+    // ----------------------------------------------------------
+
+    // Categories
+    Route::post('/competitions/categories', [CategoryController::class, 'store']);
+    Route::prefix('/competitions/categories/{categoryId}')->group(function () {
+        Route::put('/', [CategoryController::class, 'update']);
+        Route::delete('/', [CategoryController::class, 'destroy']);
     });
 
-    Route::get('users', [UserController::class, 'index']);
-    Route::get('users/participants', [UserController::class, 'show']);
-    Route::delete('users/{userId}', [UserController::class, 'destroy']);
-
-    Route::prefix('competitions/{slug}')->group(function () {
-        // using method put, request body not working
-        Route::post('', [CompetitionController::class, 'update']);
-        Route::delete('', [CompetitionController::class, 'destroy']);
+    // Competitions
+    Route::post('/competitions', [CompetitionController::class, 'store']);
+    Route::prefix('/competitions/{slug}')->group(function () {
+        Route::post('/', [CompetitionController::class, 'update']); // PUT not used: request body not working with PUT
+        Route::delete('/', [CompetitionController::class, 'destroy']);
     });
-    Route::post('competitions', [CompetitionController::class, 'store']);
-    Route::get('seminar', [SeminarController::class, 'index']);
-    Route::get('seminar/{userId}', [SeminarController::class, 'tampil']);
-    Route::get('seminar/{userId}/admin', [SeminarController::class, 'show']);
-    Route::post('seminar/{userId}/update', [SeminarController::class, 'update']);
-    Route::get('teams', [TeamController::class, 'index']);
-    Route::post('teams/{competitionSlug}', [TeamController::class, 'store']);
-    Route::get('teams/{teamId}', [TeamController::class, 'show']);
-    Route::get('teams/{teamId}/admin', [AdminGetDetailTeamController::class, 'show']);
-    Route::post('teams/{teamId}/update', [TeamController::class, 'update']);
-    Route::delete('teams/{teamId}', [TeamController::class, 'destroy']);
-    Route::put('teams/join', [JoinTeamController::class, 'store']);
-    Route::delete('teams/{teamId}/members/{memberId}', DeleteTeamMemberController::class);
-    Route::post('individual/{competitionSlug}', JoinIndividualCompetitionController::class);
-    Route::get('profile', [ParticipantController::class, 'show']);
-    Route::post('profile', [ParticipantController::class, 'update']);
-    Route::get('competitions/mine', CompetitionMineController::class);
-    Route::post('payment/{teamId}', [PaymentController::class, 'store']);
-    Route::post('paymentseminar/{userId}', [PaymentSeminarController::class, 'store']);
-    Route::post('payment/{teamId}/payment-status', [PaymentStatusController::class, 'update']);
 
-    Route::prefix('events')->group(function () {
+    // Events
+    Route::prefix('/events')->group(function () {
         Route::get('/', [EventController::class, 'index']);
         Route::post('/', [EventController::class, 'store']);
         Route::put('/{eventId}', [EventController::class, 'update']);
@@ -95,18 +97,48 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::put('/{eventId}/set-active', [EventController::class, 'changeIsActive']);
     });
 
-    // Admin
-    Route::prefix('admin')->group(function () {
+    // Users
+    Route::get('/users', [UserController::class, 'index']);
+    Route::delete('/users/{userId}', [UserController::class, 'destroy']);
+
+    // Admin — Teams & Seminar
+    Route::prefix('/admin')->group(function () {
         Route::get('/teams', [AdminTeamController::class, 'index']);
         Route::get('/teams/{teamId}', [AdminTeamController::class, 'show']);
     });
+    Route::get('/teams/{teamId}/admin', [AdminGetDetailTeamController::class, 'show']);
+    Route::get('/seminar/{userId}/admin', [SeminarController::class, 'show']);
+
+    // Admin — Payment
+    Route::post('/payment/{teamId}/payment-status', [PaymentStatusController::class, 'update']);
+
+    // ----------------------------------------------------------
+    // USER / PARTICIPANT ROUTES
+    // ----------------------------------------------------------
+
+    // Profile
+    Route::get('/profile', [ParticipantController::class, 'show']);
+    Route::post('/profile', [ParticipantController::class, 'update']);
+    Route::get('/users/participants', [UserController::class, 'index']); // Point to index() since show() was deleted
+
+    // Competitions
+    Route::post('/individual/{competitionSlug}', JoinIndividualCompetitionController::class);
+
+    // Seminar
+    Route::get('/seminar', [SeminarController::class, 'index']);
+    Route::get('/seminar/{userId}', [SeminarController::class, 'show']); // Point to show() since tampil() was deleted
+    Route::post('/seminar/{userId}/update', [SeminarController::class, 'update']);
+
+    // Teams
+    Route::get('/teams', [TeamController::class, 'index']);
+    Route::post('/teams/{competitionSlug}', [TeamController::class, 'store']);
+    Route::get('/teams/{teamId}', [TeamController::class, 'show']);
+    Route::post('/teams/{teamId}/update', [TeamController::class, 'update']);
+    Route::delete('/teams/{teamId}', [TeamController::class, 'destroy']);
+    Route::put('/teams/join', [JoinTeamController::class, 'store']);
+    Route::delete('/teams/{teamId}/members/{memberId}', DeleteTeamMemberController::class);
+
+    // Payment
+    Route::post('/payment/{teamId}', [PaymentController::class, 'store']);
+    Route::post('/paymentseminar/{userId}', [PaymentSeminarController::class, 'store']);
 });
-
-Route::get('competitions/categories', [CategoryController::class, 'index']);
-Route::get('competitions', [CompetitionController::class, 'index']);
-Route::get('competitions/{slug}', [CompetitionController::class, 'show']);
-
-Route::post('login', [LoginController::class, 'store'])->name('login');
-Route::post('register', [RegisterController::class, 'store'])->name('register');
-Route::post('forgot-password', [PasswordResetLinkController::class, 'store']);
-Route::post('reset-password', [NewPasswordController::class, 'store']);

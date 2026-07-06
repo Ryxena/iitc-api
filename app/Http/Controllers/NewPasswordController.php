@@ -4,12 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreNewPasswordRequest;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 
 class NewPasswordController extends Controller
 {
-    public function store(StoreNewPasswordRequest $request)
+    public function store(StoreNewPasswordRequest $request): JsonResponse
     {
         $status = Password::reset(
             $request->only('email', 'password', 'token'),
@@ -23,19 +24,9 @@ class NewPasswordController extends Controller
         );
 
         if ($status === Password::PASSWORD_RESET) {
-            $responseData = [
-                'status' => 1,
-                'message' => 'Successs reset password',
-            ];
-
-            return response()->json($responseData);
+            return $this->success('Successs reset password');
         }
 
-        $responseData = [
-            'status' => 0,
-            'message' => 'Fail reset password',
-        ];
-
-        return response()->json($responseData);
+        return $this->error('Fail reset password', 400);
     }
 }

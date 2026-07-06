@@ -13,94 +13,72 @@ class EventController extends Controller
     {
         $events = Event::query()->get();
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed get all competition',
-            'data' => [
-                'events' => $events,
-            ],
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed get all events.', [
+            'events' => $events,
+        ]);
     }
 
-    public function store(StoreEventRequest $request)
+    public function store(StoreEventRequest $request): JsonResponse
     {
         $this->authorize('create', Event::class);
 
-        $eventData = [
-            'name' => $request->name,
+        // Business logic validation: duplicate name check
+        $exists = Event::query()->where('name', $request->name)->exists();
+        if ($exists) {
+            return $this->error('An event with this name already exists.', 400);
+        }
+
+        $event = Event::query()->create([
+            'name'        => $request->name,
             'description' => $request->description,
-        ];
+        ]);
 
-        $event = Event::query()->create($eventData);
-
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed create new event',
-            'data' => [
-                'event' => $event,
-            ],
-        ];
-
-        return response()->json($responseData, 201);
+        return $this->success('Succeed create new event.', [
+            'event' => $event,
+        ], 201);
     }
 
-    public function update(UpdateEventRequest $request, string $eventId)
+    public function update(UpdateEventRequest $request, string $eventId): JsonResponse
     {
-        $this->authorize('update', Event::query()->where('id', $eventId)->firstOrFail());
-        $event = Event::query()->where('id', $eventId)->firstOrFail();
+        $event = Event::query()->findOrFail($eventId);
+        $this->authorize('update', $event);
 
-        $eventData = [
-            'name' => $request->name,
+        // Check if updating to a duplicate name
+        $exists = Event::query()->where('name', $request->name)->where('id', '!=', $eventId)->exists();
+        if ($exists) {
+            return $this->error('An event with this name already exists.', 400);
+        }
+
+        $event->update([
+            'name'        => $request->name,
             'description' => $request->description,
-        ];
+        ]);
 
-        $event->update($eventData);
-
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed update event',
-            'data' => [
-                'event' => $event,
-            ],
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed update event.', [
+            'event' => $event,
+        ]);
     }
 
-    public function destroy(string $eventId)
+    public function destroy(string $eventId): JsonResponse
     {
-        $this->authorize('delete', Event::query()->where('id', $eventId)->firstOrFail());
-
-        $event = Event::query()->where('id', $eventId)->firstOrFail();
+        $event = Event::query()->findOrFail($eventId);
+        $this->authorize('delete', $event);
+        
         $event->delete();
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed delete even$event',
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed delete event.');
     }
 
     public function changeIsActive(string $eventId): JsonResponse
     {
-        $this->authorize('update', Event::query()->where('id', $eventId)->firstOrFail());
+        $event = Event::query()->findOrFail($eventId);
+        $this->authorize('update', $event);
 
         Event::query()->where('id', '!=', $eventId)->update(['is_active' => 0]);
-        Event::query()->where('id', '=', $eventId)->update(['is_active' => 1]);
+        $event->update(['is_active' => 1]);
 
-        $event = Event::query()->where('id', $eventId)->firstOrFail();
-
-        $responseData = [
-            'status' => 1,
-            'message' => 'Succeed make event active',
-            'data' => [
-                'event' => $event,
-            ],
-        ];
-
-        return response()->json($responseData, 200);
+        return $this->success('Succeed make event active.', [
+            'event' => $event,
+        ]);
     }
 }

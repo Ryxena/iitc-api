@@ -14,11 +14,18 @@ class PaymentController extends Controller
 {
     public function store(StorePaymentRequest $request, string $teamId): JsonResponse
     {
-        $this->authorize('create', [Payment::class, new Payment, Team::query()->findOrFail($teamId)]);
         $team = Team::query()->findOrFail($teamId);
+        $this->authorize('create', [Payment::class, new Payment, $team]);
+
+        // Business logic validation: check if payment is already VALID
+        $existingStatus = $team->paymentStatus->status ?? null;
+        if ($existingStatus === PaymentStatusHelper::VALID) {
+            return $this->error('This team has already been verified and paid.', 400);
+        }
+
         $receiptUrl = $request->file('proveOfPayment')->store('receipt', ['disk' => 'public']);
         $paymentData = [
-            'team_id' => $team->id,
+            'team_id'          => $team->id,
             'transfer_receipt' => Storage::disk('public')->url($receiptUrl),
         ];
 
@@ -26,23 +33,23 @@ class PaymentController extends Controller
             ['team_id' => $team->id],
             $paymentData,
         );
+
         $prevPaymentStatus = PaymentStatus::query()->where('team_id', $team->id)->first();
-        if ($prevPaymentStatus != null) {
+        if ($prevPaymentStatus !== null) {
             $prevPaymentStatus->status = PaymentStatusHelper::PENDING;
             $prevPaymentStatus->save();
+        } else {
+            PaymentStatus::query()->create([
+                'team_id' => $team->id,
+                'status'  => PaymentStatusHelper::PENDING,
+            ]);
         }
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'success post proof of payment',
-            'data' => [
-                'team' => [
-                    'teamId' => $teamId,
-                ],
-                'payment' => $payment,
+        return $this->success('success post proof of payment', [
+            'team' => [
+                'teamId' => $teamId,
             ],
-        ];
-
-        return response()->json($responseData);
+            'payment' => $payment,
+        ]);
     }
 }

@@ -14,15 +14,22 @@ class PaymentSeminarController extends Controller
 {
     public function store(StorePaymentSeminarRequest $request, string $userId): JsonResponse
     {
-        $this->authorize('create', [PaymentSeminar::class, new PaymentSeminar, User::query()->findOrFail($userId)]);
-        // $this->authorize('create', [PaymentSeminar::class, new PaymentSeminar(), $user]);
         $user = User::query()->findOrFail($userId);
+        $this->authorize('create', [PaymentSeminar::class, new PaymentSeminar, $user]);
+
+        // Business logic validation: check if payment is already approved/valid
+        $existingStatus = $user->paymentStatus->status ?? null;
+        if ($existingStatus === PaymentSeminarStatusHelper::VALID) {
+            return $this->error('Your seminar payment has already been verified and approved.', 400);
+        }
+
         $proofs = [];
         foreach ($request->file('proveOfPayment') as $proof) {
             $proofs[] = Storage::disk('public')->url($proof->store('receipt', ['disk' => 'public']));
         }
+        
         $paymentSeminarData = [
-            'user_id' => $user->id,
+            'user_id'          => $user->id,
             'transfer_receipt' => $proofs,
         ];
 
@@ -30,23 +37,23 @@ class PaymentSeminarController extends Controller
             ['user_id' => $user->id],
             $paymentSeminarData,
         );
+        
         $prevPaymentSeminarStatus = PaymentSeminarStatus::query()->where('user_id', $user->id)->first();
-        if ($prevPaymentSeminarStatus != null) {
+        if ($prevPaymentSeminarStatus !== null) {
             $prevPaymentSeminarStatus->status = PaymentSeminarStatusHelper::PENDING;
             $prevPaymentSeminarStatus->save();
+        } else {
+            PaymentSeminarStatus::query()->create([
+                'user_id' => $user->id,
+                'status'  => PaymentSeminarStatusHelper::PENDING,
+            ]);
         }
 
-        $responseData = [
-            'status' => 1,
-            'message' => 'success post proof of payment',
-            'data' => [
-                'user' => [
-                    'userId' => $userId,
-                ],
-                'payment' => $paymentSeminar,
+        return $this->success('success post proof of payment', [
+            'user' => [
+                'userId' => $userId,
             ],
-        ];
-
-        return response()->json($responseData);
+            'payment' => $paymentSeminar,
+        ]);
     }
 }

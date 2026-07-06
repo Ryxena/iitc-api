@@ -14,31 +14,38 @@ class JoinIndividualCompetitionController extends Controller
     {
         try {
             $competition = Competition::query()->where('slug', $competitionSlug)->firstOrFail();
-            $teamData = [
-                'leader_id' => auth()->id(),
+
+            // Business validation: verify if competition allows individual entry
+            if ($competition->max_members !== 1) {
+                return $this->error('This competition is team-based. You must register or join a team.', 400);
+            }
+
+            // Business validation: check if user already registered or joined
+            $userId = auth()->id();
+            $hasTeamInCompetition = Team::query()->where('competition_id', $competition->id)
+                ->where(function ($query) use ($userId) {
+                    $query->where('leader_id', $userId)
+                        ->orWhereHas('members', function ($q) use ($userId) {
+                            $q->where('user_id', $userId);
+                        });
+                })->exists();
+
+            if ($hasTeamInCompetition) {
+                return $this->error('You have already joined this competition.', 400);
+            }
+
+            $team = Team::query()->create([
+                'leader_id'      => $userId,
                 'competition_id' => $competition->id,
-            ];
+            ]);
 
-            $team = Team::query()->create($teamData);
-
-            $responseData = [
-                'status' => 1,
-                'message' => 'Succeed joined competition',
-                'data' => [
-                    'team' => [
-                        'id' => $team->id,
-                    ],
+            return $this->success('Succeed joined competition', [
+                'team' => [
+                    'id' => $team->id,
                 ],
-            ];
-
-            return response()->json($responseData, 200);
+            ]);
         } catch (Exception $exception) {
-            $responseData = [
-                'status' => 0,
-                'message' => $exception->getMessage(),
-            ];
-
-            return response()->json($responseData, 400);
+            return $this->error($exception->getMessage(), 400);
         }
     }
 }

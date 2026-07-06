@@ -16,18 +16,18 @@ class CompetitionMineController extends Controller
             $user = User::query()
                 ->with([
                     'teams' => function ($query) {
-                        $query->withCount('members');
+                        $query->withCount('members')->with([
+                            'competition',
+                            'paymentStatus',
+                            'payment',
+                        ]);
                     },
-                    'teams' => [
-                        'competition',
-                        'paymentStatus',
-                        'payment',
-                    ],
                     'asMembers' => function ($query) {
                         $query->withCount('members');
                     },
                     'asMembers.competition'])
                 ->findOrFail(auth()->id());
+                
             $teams = [];
             foreach ($user->teams as $team) {
                 $teams[] = $this->transformDBToResponseTeam($team);
@@ -35,22 +35,12 @@ class CompetitionMineController extends Controller
             foreach ($user->asMembers as $team) {
                 $teams[] = $this->transformDBToResponseTeam($team);
             }
-            $responseData = [
-                'status' => 1,
-                'message' => 'Succeed get all competition',
-                'data' => [
-                    'teams' => $teams,
-                ],
-            ];
 
-            return response()->json($responseData, 200);
+            return $this->success('Succeed get all competition', [
+                'teams' => $teams,
+            ]);
         } catch (Exception $exception) {
-            $responseData = [
-                'status' => 0,
-                'message' => $exception->getMessage(),
-            ];
-
-            return response()->json($responseData, 400);
+            return $this->error($exception->getMessage(), 400);
         }
     }
 
@@ -60,15 +50,15 @@ class CompetitionMineController extends Controller
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
 
         return [
-            'teamId' => $team->id,
+            'teamId'          => $team->id,
             'competitionName' => $team->competition->name,
-            'cSlug' => $team->competition->slug,
-            'teamName' => $team->name,
-            'avatar' => $team->avatar,
-            'isSubmit' => isset($team->submission),
-            'maxMembers' => $team->competition->max_members,
-            'currentMembers' => $team->members_count,
-            'isActive' => $paymentStatus,
+            'cSlug'           => $team->competition->slug,
+            'teamName'        => $team->name,
+            'avatar'          => $team->avatar,
+            'isSubmit'        => isset($team->submission),
+            'maxMembers'      => $team->competition->max_members,
+            'currentMembers'  => $team->members_count,
+            'isActive'        => $paymentStatus,
         ];
     }
 }

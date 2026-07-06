@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Auth\AuthenticationException;
 use App\Http\Requests\StoreLoginRequest;
 use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -16,28 +15,17 @@ class LoginController extends Controller
         try {
             $user = User::query()->where('email', $request->email)->firstOrFail();
             if (! Hash::check($request->password, $user->password)) {
-                throw new AuthenticationException('Invalid Password');
+                return $this->error('Invalid Password', 401);
             }
 
             $token = $user->createToken('authToken')->plainTextToken;
 
-            $data = [
-                'status' => 1,
-                'message' => 'berhasil login',
-                'data' => [
-                    'access_token' => $token,
-                    'email_verified_at' => $user->email_verified_at,
-                ],
-            ];
-
-            return response()->json($data, 200);
+            return $this->success('berhasil login', [
+                'access_token'       => $token,
+                'email_verified_at'  => $user->email_verified_at,
+            ]);
         } catch (ModelNotFoundException $exception) {
-            $responseData = [
-                'status' => 0,
-                'message' => 'User tidak ditemukan',
-            ];
-
-            return response()->json($responseData, 404);
+            return $this->error('User tidak ditemukan', 404);
         }
     }
 }
