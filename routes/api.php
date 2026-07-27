@@ -20,7 +20,6 @@ use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SeminarController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\UserController;
-use App\Http\Controllers\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -39,9 +38,6 @@ Route::get('/', fn () => 'ok! @iitc');
 //     throw new Exception('My first Sentry error!');
 // });
 
-Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
-    ->middleware(['signed', 'throttle:6,1'])
-    ->name('verification.verify');
 
 Route::post('/login', [LoginController::class, 'store'])->name('login');
 Route::post('/register', [RegisterController::class, 'store'])->name('register');
@@ -52,7 +48,7 @@ Route::post('/reset-password', [NewPasswordController::class, 'store']);
 // NOTE: 'competitions/mine' must be declared BEFORE '{slug}' to avoid wildcard conflict
 Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/categories', [CategoryController::class, 'index']);
-Route::get('/competitions/mine', CompetitionMineController::class)->middleware(['auth:sanctum', 'verified']);
+Route::get('/competitions/mine', CompetitionMineController::class)->middleware('auth:sanctum');
 Route::get('/competitions/{slug}', [CompetitionController::class, 'show']);
 
 // ============================================================
@@ -64,10 +60,10 @@ Route::middleware('auth:sanctum')->group(function () {
 });
 
 // ============================================================
-// AUTHENTICATED + VERIFIED ROUTES (auth:sanctum + verified)
+// AUTHENTICATED ROUTES (auth:sanctum)
 // ============================================================
 
-Route::middleware(['auth:sanctum', 'verified'])->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
 
     // ----------------------------------------------------------
     // ADMIN ROUTES
