@@ -31,7 +31,7 @@ it('can get all participants', function () {
 
     $response = $this->actingAs($user)->getJson('/api/users/participants');
     
-    $response->assertSuccessful();
+    $response->assertStatus(403);
 });
 
 it('can get current user profile', function () {

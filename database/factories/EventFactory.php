@@ -20,6 +20,7 @@ class EventFactory extends Factory
         return [
             'name' => fake()->sentence(2),
             'description' => fake()->sentence(10),
+            'is_active' => fake()->boolean(),
         ];
     }
 }

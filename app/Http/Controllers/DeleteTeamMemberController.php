@@ -24,6 +24,7 @@ class DeleteTeamMemberController extends Controller
 
         return $this->success('Succeed delete user from team', [
             'teamId'   => $teamId,
+            'memberName' => $member->name,
             'memberId' => $memberId,
         ]);
     }

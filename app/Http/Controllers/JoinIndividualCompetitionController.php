@@ -20,9 +20,12 @@ class JoinIndividualCompetitionController extends Controller
                 return $this->error('This competition is team-based. You must register or join a team.', 400);
             }
 
-            // Business validation: check if user already registered or joined
+            // Business validation: check if user already registered or joined in this event
             $userId = auth()->id();
-            $hasTeamInCompetition = Team::query()->where('competition_id', $competition->id)
+            $hasTeamInEvent = Team::query()
+                ->whereHas('competition', function ($q) use ($competition) {
+                    $q->where('event_id', $competition->event_id);
+                })
                 ->where(function ($query) use ($userId) {
                     $query->where('leader_id', $userId)
                         ->orWhereHas('members', function ($q) use ($userId) {
@@ -30,8 +33,8 @@ class JoinIndividualCompetitionController extends Controller
                         });
                 })->exists();
 
-            if ($hasTeamInCompetition) {
-                return $this->error('You have already joined this competition.', 400);
+            if ($hasTeamInEvent) {
+                return $this->error('You have already joined a competition in this event.', 400);
             }
 
             $team = Team::query()->create([

@@ -29,19 +29,13 @@ it('can store payment for team', function () {
     expect($response->status())->toBeIn([200, 201, 403, 400]);
 });
 
-it('can store payment for seminar user', function () {
+it('can register for seminar for free', function () {
     $user = User::factory()->create();
     $user->assignRole('User');
 
-    Storage::fake('public');
-    $file = UploadedFile::fake()->image('payment.jpg');
+    $response = $this->actingAs($user)->postJson('/api/seminar/register');
 
-    $response = $this->actingAs($user)->postJson('/api/paymentseminar/' . $user->id, [
-        'amount' => 20000,
-        'proveOfPayment' => [$file],
-    ]);
-
-    expect($response->status())->toBeIn([200, 201, 403, 400]);
+    expect($response->status())->toBeIn([200, 201, 403, 409]);
 });
 
 it('can update payment status for team', function () {

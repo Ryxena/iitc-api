@@ -58,23 +58,21 @@ class TeamController extends Controller
         $this->authorize('create', Team::class);
         $competition = Competition::query()->where('slug', $competitionSlug)->firstOrFail();
         
-        // Business logic validation: check if user already has a team in this competition (as leader or member)
+        // Business logic validation: check if user already has a team in this event (as leader or member)
         $userId = auth()->id();
-        $hasTeamAsLeader = Team::query()->where('competition_id', $competition->id)
-            ->where('leader_id', $userId)
-            ->exists();
-            
-        if ($hasTeamAsLeader) {
-            return $this->error('You are already the leader of a team in this competition.', 400);
-        }
-        
-        $hasTeamAsMember = Team::query()->where('competition_id', $competition->id)
-            ->whereHas('members', function ($query) use ($userId) {
-                $query->where('user_id', $userId);
+        $hasTeamInEvent = Team::query()
+            ->whereHas('competition', function ($q) use ($competition) {
+                $q->where('event_id', $competition->event_id);
+            })
+            ->where(function ($query) use ($userId) {
+                $query->where('leader_id', $userId)
+                    ->orWhereHas('members', function ($q) use ($userId) {
+                        $q->where('user_id', $userId);
+                    });
             })->exists();
-            
-        if ($hasTeamAsMember) {
-            return $this->error('You are already a member of a team in this competition.', 400);
+
+        if ($hasTeamInEvent) {
+            return $this->error('You are already a member or leader of a team in this event.', 400);
         }
 
         $code = fake()->bothify('##??##??');

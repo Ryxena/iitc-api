@@ -61,13 +61,8 @@ class User extends Authenticatable implements MustVerifyEmail
         return $isMember != null;
     }
 
-    public function payment(): HasOne
+    public function seminarRegistration(): HasOne
     {
-        return $this->hasOne(PaymentSeminar::class);
-    }
-
-    public function paymentStatus(): HasOne
-    {
-        return $this->hasOne(PaymentSeminarStatus::class);
+        return $this->hasOne(SeminarRegistration::class);
     }
 }

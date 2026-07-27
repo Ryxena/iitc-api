@@ -15,7 +15,6 @@ use App\Http\Controllers\NewPasswordController;
 use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\PasswordResetLinkController;
 use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\PaymentSeminarController;
 use App\Http\Controllers\PaymentStatusController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SeminarController;
@@ -36,9 +35,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', fn () => 'ok! @iitc');
 
-Route::get('/debug-sentry', function () {
-    throw new Exception('My first Sentry error!');
-});
+// Route::get('/debug-sentry', function () {
+//     throw new Exception('My first Sentry error!');
+// });
 
 Route::get('/verify-email/{id}/{hash}', VerifyEmailController::class)
     ->middleware(['signed', 'throttle:6,1'])
@@ -107,7 +106,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
         Route::get('/teams/{teamId}', [AdminTeamController::class, 'show']);
     });
     Route::get('/teams/{teamId}/admin', [AdminGetDetailTeamController::class, 'show']);
-    Route::get('/seminar/{userId}/admin', [SeminarController::class, 'show']);
 
     // Admin — Payment
     Route::post('/payment/{teamId}/payment-status', [PaymentStatusController::class, 'update']);
@@ -126,8 +124,11 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     // Seminar
     Route::get('/seminar', [SeminarController::class, 'index']);
-    Route::get('/seminar/{userId}', [SeminarController::class, 'show']); // Point to show() since tampil() was deleted
-    Route::post('/seminar/{userId}/update', [SeminarController::class, 'update']);
+    Route::post('/seminar/register', [SeminarController::class, 'register']);
+    Route::get('/seminar/{userId}', [SeminarController::class, 'show']);
+    Route::post('/seminar/{userId}/verify-attendance', [SeminarController::class, 'verifyAttendance']);
+    Route::get('/seminar/{userId}/certificate', [SeminarController::class, 'downloadCertificate']);
+    Route::get('/seminar/{userId}/admin', [SeminarController::class, 'show']);
 
     // Teams
     Route::get('/teams', [TeamController::class, 'index']);
@@ -140,5 +141,4 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function () {
 
     // Payment
     Route::post('/payment/{teamId}', [PaymentController::class, 'store']);
-    Route::post('/paymentseminar/{userId}', [PaymentSeminarController::class, 'store']);
 });

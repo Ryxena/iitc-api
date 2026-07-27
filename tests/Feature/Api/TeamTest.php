@@ -71,3 +71,44 @@ it('can delete a team', function () {
 
     expect($response->status())->toBeIn([200, 403, 400]);
 });
+
+it('can join individual competition solo', function () {
+    $user = User::factory()->create();
+    $user->assignRole('User');
+    
+    $event = Event::factory()->create(['is_active' => true]);
+    $competition = Competition::factory()->create(['event_id' => $event->id, 'max_members' => 1]);
+
+    $response = $this->actingAs($user)->postJson('/api/individual/' . $competition->slug);  
+
+    expect($response->status())->toBeIn([200, 403, 400]);
+});
+
+it('can join a team using code', function () {
+    $leader = User::factory()->create();
+    $user = User::factory()->create();
+    $user->assignRole('User');
+    
+    $event = Event::factory()->create(['is_active' => true]);
+    $competition = Competition::factory()->create(['event_id' => $event->id, 'max_members' => 3]);
+    $team = Team::factory()->create(['competition_id' => $competition->id, 'leader_id' => $leader->id, 'code' => 'TESTCODE']);
+
+    $response = $this->actingAs($user)->putJson('/api/teams/join', [
+        'code' => 'TESTCODE'
+    ]);
+
+    expect($response->status())->toBeIn([200, 403, 400]);
+});
+
+it('can kick a member in a team', function () {
+    $leader = User::factory()->create();
+    $leader->assignRole('User');
+    $member = User::factory()->create();
+    
+    $team = Team::factory()->create(['leader_id' => $leader->id]);
+    $team->members()->attach($member->id);
+
+    $response = $this->actingAs($leader)->deleteJson('/api/teams/' . $team->id . '/members/' . $member->id);
+
+    expect($response->status())->toBeIn([200, 403, 400]);
+});

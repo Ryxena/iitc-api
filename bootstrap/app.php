@@ -32,6 +32,15 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware) {
         // Sanctum stateful API (matches original IITC behavior)
         $middleware->statefulApi();
+
+        // Admin role middleware alias
+        $middleware->alias([
+            'admin'       => \App\Http\Middleware\EnsureIsAdmin::class,
+            'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
+        ]);
+
+        // Redirect unauthenticated web requests to the web login page
+        $middleware->redirectGuestsTo(fn () => route('login-web'));
     })
     ->withExceptions(function (Exceptions $exceptions) {
         Integration::handles($exceptions);

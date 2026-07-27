@@ -42,6 +42,7 @@ class PaymentController extends Controller
             PaymentStatus::query()->create([
                 'team_id' => $team->id,
                 'status'  => PaymentStatusHelper::PENDING,
+                'reason'  => '',
             ]);
         }
 

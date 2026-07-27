@@ -2,99 +2,171 @@
 
 namespace App\Http\Controllers;
 
-use App\Helpers\PaymentSeminarStatus as PaymentSeminarStatusHelper;
-use App\Http\Requests\UpdatePaymentSeminarRequest;
-use App\Mail\SendSeminarParticipantTicket;
-use App\Mail\SendSeminarParticipantTicketFail;
-use App\Models\PaymentSeminar;
-use App\Models\PaymentSeminarStatus;
+use App\Models\SeminarRegistration;
 use App\Models\User;
+use App\Services\CertificateService;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Mail;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class SeminarController extends Controller
 {
+    public function __construct(private CertificateService $certificateService) {}
+
+    /**
+     * [ADMIN] List all registered seminar participants.
+     */
     public function index(): JsonResponse
     {
-        $users = User::query()->role('User')->whereHas('payment')->with([
-            'paymentStatus',
-            'payment',
-        ])->get();
+        $registrations = SeminarRegistration::query()
+            ->with('user')
+            ->get();
 
-        $usersResponse = [];
-        foreach ($users as $user) {
-            $paymentStatus = isset($user->payment) ? PaymentSeminarStatusHelper::PENDING : null;
-            $paymentStatus = $user->paymentStatus->status ?? $paymentStatus;
-            $usersResponse[] = [
-                'id'              => $user->id,
-                'name'            => $user->name,
-                'email'           => $user->email,
-                'phone'           => $user->phone,
-                'isActive'        => $paymentStatus,
-                'transferReceipt' => $user->payment->transfer_receipt ?? null,
-            ];
-        }
+        $data = $registrations->map(fn (SeminarRegistration $reg) => [
+            'userId'            => $reg->user_id,
+            'name'              => $reg->user->name ?? null,
+            'email'             => $reg->user->email ?? null,
+            'phone'             => $reg->user->phone ?? null,
+            'attended'          => $reg->attended,
+            'certificateNumber' => $reg->certificate_number,
+            'certificateUrl'    => $reg->certificate_path
+                ? Storage::disk('public')->url($reg->certificate_path)
+                : null,
+        ]);
 
-        return $this->success('success get all users', ['users' => $usersResponse]);
+        return $this->success('success get all seminar registrations', ['registrations' => $data]);
     }
 
+    /**
+     * [USER] Register self for the seminar (free, no payment required).
+     */
+    public function register(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        $alreadyRegistered = SeminarRegistration::query()
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if ($alreadyRegistered) {
+            return $this->error('You have already registered for this seminar.', 409);
+        }
+
+        SeminarRegistration::query()->create([
+            'user_id'  => $user->id,
+            'attended' => false,
+        ]);
+
+        return $this->success('Seminar registration successful. See you there!', [
+            'userId' => $user->id,
+            'name'   => $user->name,
+            'email'  => $user->email,
+        ]);
+    }
+
+    /**
+     * [USER / ADMIN] Get a single user's seminar registration and certificate status.
+     */
     public function show(string $userId): JsonResponse
     {
-        $this->authorize('viewAny', User::class);
-        $user = User::query()->role('User')->whereHas('payment')->with([
-            'paymentStatus',
-            'payment',
-        ])->findOrFail($userId);
-
-        $paymentStatus = isset($user->payment) ? PaymentSeminarStatusHelper::PENDING : null;
-        $paymentStatus = $user->paymentStatus->status ?? $paymentStatus;
-        
-        $userResponse = [
-            'id'              => $user->id,
-            'name'            => $user->name,
-            'email'           => $user->email,
-            'phone'           => $user->phone,
-            'isActive'        => $paymentStatus,
-            'transferReceipt' => $user->payment->transfer_receipt ?? null,
-        ];
-
-        return $this->success('success get all user', $userResponse);
-    }
-
-    public function update(UpdatePaymentSeminarRequest $request, string $userId): JsonResponse
-    {
-        $this->authorize('update', [PaymentSeminarStatus::class, new PaymentSeminarStatus]);
         $user = User::query()->findOrFail($userId);
 
-        // Business logic validation: verify payment seminar uploaded
-        $paymentExists = PaymentSeminar::query()->where('user_id', $user->id)->exists();
-        if (! $paymentExists) {
-            return $this->error('No seminar payment has been uploaded for this user.', 400);
+        $registration = SeminarRegistration::query()
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($registration === null) {
+            return $this->error('This user has not registered for the seminar.', 404);
         }
 
-        $paymentStatusData = [
-            'user_id' => $user->id,
-            'status'  => $request->input('isApprove') ? PaymentSeminarStatusHelper::VALID : PaymentSeminarStatusHelper::INVALID,
-            'reason'  => $request->input('reason'),
-        ];
+        return $this->success('success get seminar registration', [
+            'userId'            => $user->id,
+            'name'              => $user->name,
+            'email'             => $user->email,
+            'attended'          => $registration->attended,
+            'certificateNumber' => $registration->certificate_number,
+            'certificateUrl'    => $registration->certificate_path
+                ? Storage::disk('public')->url($registration->certificate_path)
+                : null,
+        ]);
+    }
 
-        if ($request->input('isApprove')) {
-            Mail::to($user)->queue(new SendSeminarParticipantTicket($user->name, $user->email));
-        } else {
-            Mail::to($user)->queue(new SendSeminarParticipantTicketFail($user->name, $user->email, $paymentStatusData['reason']));
+    /**
+     * [ADMIN] Verify attendance and auto-generate the participant's certificate.
+     */
+    public function verifyAttendance(Request $request, string $userId): JsonResponse
+    {
+        $this->authorize('update', [SeminarRegistration::class, new SeminarRegistration]);
+
+        $user = User::query()->findOrFail($userId);
+
+        $registration = SeminarRegistration::query()
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($registration === null) {
+            return $this->error('This user has not registered for the seminar.', 404);
         }
 
-        $paymentStatus = PaymentSeminarStatus::query()->updateOrCreate(
-            ['user_id' => $user->id],
-            $paymentStatusData
-        );
+        $isApprove = (bool) $request->input('isApprove', false);
 
-        return $this->success('success update payment status', [
-            'payment' => [
-                'user_id' => $userId,
-                'status'  => $paymentStatus->status,
-                'reason'  => $paymentStatus->reason,
-            ],
+        if (! $isApprove) {
+            $registration->update(['attended' => false]);
+
+            return $this->success('Attendance marked as not attended.', [
+                'userId'   => $userId,
+                'attended' => false,
+            ]);
+        }
+
+        // Already has a certificate — just return existing URL
+        if ($registration->certificate_path !== null) {
+            return $this->success('Attendance already verified, certificate already issued.', [
+                'userId'            => $userId,
+                'attended'          => true,
+                'certificateNumber' => $registration->certificate_number,
+                'certificateUrl'    => Storage::disk('public')->url($registration->certificate_path),
+            ]);
+        }
+
+        // Generate certificate
+        $cert = $this->certificateService->generate($user->name, $user->id);
+
+        $registration->update([
+            'attended'           => true,
+            'certificate_number' => $cert['certificate_number'],
+            'certificate_path'   => $cert['certificate_path'],
+        ]);
+
+        return $this->success('Attendance verified and certificate generated successfully.', [
+            'userId'            => $userId,
+            'attended'          => true,
+            'certificateNumber' => $cert['certificate_number'],
+            'certificateUrl'    => $cert['url'],
+        ]);
+    }
+
+    /**
+     * [USER] Download the user's certificate PDF.
+     */
+    public function downloadCertificate(string $userId): mixed
+    {
+        $registration = SeminarRegistration::query()
+            ->where('user_id', $userId)
+            ->first();
+
+        if ($registration === null || $registration->certificate_path === null) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Certificate not yet issued. Please wait for attendance verification.',
+            ], 404);
+        }
+
+        $path = Storage::disk('public')->path($registration->certificate_path);
+
+        return response()->file($path, [
+            'Content-Type'        => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="certificate-' . $registration->certificate_number . '.pdf"',
         ]);
     }
 }

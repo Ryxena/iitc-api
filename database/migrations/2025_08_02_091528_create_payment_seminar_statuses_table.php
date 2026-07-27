@@ -1,6 +1,5 @@
 <?php
 
-use App\Helpers\PaymentSeminarStatus;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -19,12 +18,12 @@ return new class extends Migration
             $table->enum(
                 'status',
                 [
-                    PaymentSeminarStatus::INVALID,
-                    PaymentSeminarStatus::PENDING,
-                    PaymentSeminarStatus::VALID,
+                    'INVALID',
+                    'PENDING',
+                    'VALID',
                 ]
             )
-                ->default(PaymentSeminarStatus::PENDING);
+                ->default('PENDING');
             $table->string('reason');
             $table->timestamps();
         });

@@ -15,8 +15,8 @@ class DummyDataSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('Creating 100 Users and their Teams (this may take a minute due to password hashing)...');
-        $users = User::factory(100)->create();
+        $this->command->info('Creating 10 Users and their Teams (this may take a minute due to password hashing)...');
+        $users = User::factory(10)->create();
         $teams = collect();
 
         foreach ($users as $user) {
@@ -28,8 +28,8 @@ class DummyDataSeeder extends Seeder
             $teams->push($team);
         }
 
-        $this->command->info('Creating 300 Members for the Teams (this may take a few minutes)...');
-        $members = User::factory(300)->create();
+        $this->command->info('Creating 30 Members for the Teams (this may take a few minutes)...');
+        $members = User::factory(30)->create();
         $memberIndex = 0;
         
         foreach ($teams as $team) {
@@ -49,5 +49,47 @@ class DummyDataSeeder extends Seeder
                 'user_id' => $member->id,
             ]);
         }
+
+        $this->command->info('Creating dummy payments and payment statuses for testing dashboard...');
+        
+        // Buat folder jika belum ada
+        $receiptDir = storage_path('app/public/receipt');
+        if (!file_exists($receiptDir)) {
+            mkdir($receiptDir, 0755, true);
+        }
+
+        // Buat satu file dummy image menggunakan GD library bawaan PHP
+        $dummyImageName = 'dummy_receipt_seeder.png';
+        $dummyImagePath = $receiptDir . '/' . $dummyImageName;
+        
+        if (!file_exists($dummyImagePath)) {
+            $image = imagecreate(600, 800);
+            imagecolorallocate($image, 30, 33, 48); // background color
+            $textColor = imagecolorallocate($image, 200, 200, 255);
+            imagestring($image, 5, 180, 350, "BUKTI PEMBAYARAN DUMMY", $textColor);
+            imagestring($image, 5, 230, 380, "IITC SEEDER", $textColor);
+            imagepng($image, $dummyImagePath);
+            imagedestroy($image);
+        }
+
+        $statuses = [\App\Helpers\PaymentStatus::VALID, \App\Helpers\PaymentStatus::PENDING, \App\Helpers\PaymentStatus::INVALID];
+        
+        foreach ($teams as $index => $team) {
+            // Gunakan format URL yang sama dengan logic Controller: Storage::disk('public')->url()
+            $receiptUrl = \Illuminate\Support\Facades\Storage::disk('public')->url('receipt/' . $dummyImageName);
+
+            \App\Models\Payment::query()->create([
+                'team_id'          => $team->id,
+                'transfer_receipt' => $receiptUrl,
+            ]);
+
+            $status = $statuses[$index % 3];
+            \App\Models\PaymentStatus::query()->create([
+                'team_id' => $team->id,
+                'status'  => $status,
+                'reason'  => ($status === \App\Helpers\PaymentStatus::INVALID) ? 'Bukti bayar blur atau nominal tidak sesuai (Contoh penolakan)' : '',
+            ]);
+        }
     }
 }
+

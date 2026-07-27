@@ -16,7 +16,8 @@ return new class extends Migration
         DB::table('events')->insert([
             'name' => 'IITC 2023',
             'description' => 'iitc 2023',
-            'is_active' => 0,
+            'is_active' => 1,
+
             'created_at' => '2024-08-05 13:37:59',
             'updated_at' => '2024-08-05 13:37:59',
         ]);
