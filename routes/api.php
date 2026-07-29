@@ -38,7 +38,6 @@ Route::get('/', fn () => 'ok! @iitc');
 //     throw new Exception('My first Sentry error!');
 // });
 
-
 Route::post('/login', [LoginController::class, 'store'])->name('login');
 Route::post('/register', [RegisterController::class, 'store'])->name('register');
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
@@ -52,18 +51,12 @@ Route::get('/competitions/mine', CompetitionMineController::class)->middleware('
 Route::get('/competitions/{slug}', [CompetitionController::class, 'show']);
 
 // ============================================================
-// AUTHENTICATED ROUTES (auth:sanctum only)
-// ============================================================
-
-Route::middleware('auth:sanctum')->group(function () {
-    Route::post('/logout', [LogoutController::class, 'store']);
-});
-
-// ============================================================
 // AUTHENTICATED ROUTES (auth:sanctum)
 // ============================================================
 
 Route::middleware('auth:sanctum')->group(function () {
+    Route::post('/logout', [LogoutController::class, 'store']);
+
 
     // ----------------------------------------------------------
     // ADMIN ROUTES
@@ -124,7 +117,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/seminar/{userId}', [SeminarController::class, 'show']);
     Route::post('/seminar/{userId}/verify-attendance', [SeminarController::class, 'verifyAttendance']);
     Route::get('/seminar/{userId}/certificate', [SeminarController::class, 'downloadCertificate']);
-    Route::get('/seminar/{userId}/admin', [SeminarController::class, 'show']);
 
     // Teams
     Route::get('/teams', [TeamController::class, 'index']);
