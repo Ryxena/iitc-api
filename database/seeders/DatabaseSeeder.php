@@ -12,7 +12,6 @@ use App\Models\SeminarRegistration;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
@@ -27,7 +26,7 @@ class DatabaseSeeder extends Seeder
         $superAdmin = User::create([
             'name'              => 'Super Admin',
             'email'             => 'superadmin@intermediaiitc.com',
-            'password'          => Hash::make('PokoknyaINIPW123'),
+            'password'          => 'PokoknyaINIPW123',
             'phone'             => 6281234567890,
             'email_verified_at' => now(),
         ]);
@@ -36,7 +35,7 @@ class DatabaseSeeder extends Seeder
         $admin = User::create([
             'name'              => 'Admin',
             'email'             => 'admin@intermediaiitc.com',
-            'password'          => Hash::make('#WeAreFamily123'),
+            'password'          => '#WeAreFamily123',
             'phone'             => 6281234567891,
             'email_verified_at' => now(),
         ]);
@@ -87,7 +86,7 @@ class DatabaseSeeder extends Seeder
             $user = User::create([
                 'name'              => $data['name'],
                 'email'             => $data['email'],
-                'password'          => Hash::make('myPassword'),
+                'password'          => 'myPassword',
                 'phone'             => $data['phone'],
                 'email_verified_at' => now(),
             ]);
@@ -137,7 +136,7 @@ class DatabaseSeeder extends Seeder
             $user = User::create([
                 'name'              => $data['name'],
                 'email'             => $data['email'],
-                'password'          => Hash::make('myPassword'),
+                'password'          => 'myPassword',
                 'phone'             => $data['phone'],
                 'email_verified_at' => now(),
             ]);
