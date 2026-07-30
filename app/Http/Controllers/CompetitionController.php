@@ -33,6 +33,9 @@ class CompetitionController extends Controller
                 return [
                     'slug'       => $competition->slug,
                     'name'       => $competition->name,
+                    'description'      => $competition->description,
+                    'guideBookLink'    => $competition->guide_book,
+                    'competitionPrice' => $competition->price,
                     'cover'      => $competition->cover,
                     'maxMembers' => $competition->max_members,
                     'categories' => $categories,

@@ -14,6 +14,10 @@ class EventSeeder extends Seeder
      */
     public function run()
     {
-        Event::factory(2)->create();
+        Event::create([
+            'name'        => 'IITC 2026',
+            'description' => 'Indonesian IT Competition 2026.',
+            'is_active'   => true,
+        ]);
     }
 }

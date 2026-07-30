@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\Category;
 use App\Models\Competition;
 use App\Models\Event;
-use App\Models\Member;
 use App\Models\Participant;
 use App\Models\Payment;
 use App\Models\PaymentStatus;
@@ -19,89 +18,41 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // ── 1. Roles & Permissions ────────────────────────────────
         $this->call(RoleAndPermissionSeeder::class);
 
-        // ── 2. Admin users ────────────────────────────────────────
         $superAdmin = User::factory()->create([
             'name'     => 'Super Admin',
-            'email'    => 'superadmin@gmail.com',
-            'password' => 'myPassword',
+            'email'    => 'superadmin@intermediaiitc.com',
+            'password' => 'PokoknyaINIPW123',
         ]);
         $superAdmin->assignRole('Super Admin');
 
         $admin = User::factory()->create([
             'name'     => 'Admin',
-            'email'    => 'admin@gmail.com',
-            'password' => 'myPassword',
+            'email'    => 'admin@intermediaiitc.com',
+            'password' => '#WeAreFamily123',
         ]);
         $admin->assignRole('Admin');
 
-        // ── 3. Event ──────────────────────────────────────────────
         $event = Event::create([
             'name'        => 'IITC 2026',
             'description' => 'Indonesian IT Competition 2026',
             'is_active'   => true,
         ]);
 
-        // ── 4. Categories ─────────────────────────────────────────
         $pelajar   = Category::create(['name' => 'Pelajar']);
         $mahasiswa = Category::create(['name' => 'Mahasiswa']);
+        
+        $this->call(CompetitionSeeder::class);
 
-        // ── 5. Competitions ───────────────────────────────────────
-        $competitions = [
-            [
-                'name'        => 'Web Design',
-                'slug'        => 'web-design',
-                'description' => 'Kompetisi desain website yang kreatif dan fungsional.',
-                'deadline'    => now()->addDays(30),
-                'max_members' => 3,
-                'price'       => 75000,
-                'guide_book'  => 'https://example.com/guidebook/web-design',
-                'event_id'    => $event->id,
-                'categories'  => [$pelajar->id, $mahasiswa->id],
-            ],
-            [
-                'name'        => 'UI/UX',
-                'slug'        => 'ui-ux',
-                'description' => 'Kompetisi perancangan antarmuka dan pengalaman pengguna terbaik.',
-                'deadline'    => now()->addDays(30),
-                'max_members' => 2,
-                'price'       => 75000,
-                'guide_book'  => 'https://example.com/guidebook/ui-ux',
-                'event_id'    => $event->id,
-                'categories'  => [$pelajar->id, $mahasiswa->id],
-            ],
-            [
-                'name'        => 'Generative AI',
-                'slug'        => 'generative-ai',
-                'description' => 'Kompetisi inovasi berbasis kecerdasan buatan generatif.',
-                'deadline'    => now()->addDays(30),
-                'max_members' => 3,
-                'price'       => 100000,
-                'guide_book'  => 'https://example.com/guidebook/gen-ai',
-                'event_id'    => $event->id,
-                'categories'  => [$mahasiswa->id],
-            ],
-        ];
+        $competitionModels = Competition::all();
 
-        $competitionModels = [];
-        foreach ($competitions as $data) {
-            $categories = $data['categories'];
-            unset($data['categories']);
-            $comp = Competition::create($data);
-            $comp->categories()->attach($categories);
-            $competitionModels[] = $comp;
-        }
-
-        // ── 6. Regular users with teams & payments ────────────────
         $statuses = [
             \App\Helpers\PaymentStatus::VALID,
             \App\Helpers\PaymentStatus::PENDING,
             \App\Helpers\PaymentStatus::INVALID,
         ];
 
-        // Ensure dummy receipt folder exists
         $receiptDir = storage_path('app/public/receipt');
         if (! file_exists($receiptDir)) {
             mkdir($receiptDir, 0755, true);
@@ -154,7 +105,6 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // ── 7. Seminar registrations ──────────────────────────────
         $seminarUsers = [
             ['name' => 'Rini Anggraeni',  'email' => 'rini@example.com',    'attended' => true],
             ['name' => 'Sandi Maulana',   'email' => 'sandi@example.com',   'attended' => true],
@@ -178,9 +128,9 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->command->info('✅ Seeder complete.');
-        $this->command->info('   Super Admin : superadmin@gmail.com / myPassword');
-        $this->command->info('   Admin       : admin@gmail.com / myPassword');
-        $this->command->info('   Competitions: Web Design, UI/UX, Generative AI');
-        $this->command->info('   Users       : 10 dengan team & payment, 5 pendaftar seminar');
+        $this->command->info('   Super Admin  : superadmin@intermediaiitc.com / PokoknyaINIPW123');
+        $this->command->info('   Admin        : admin@intermediaiitc.com / #WeAreFamily123');
+        $this->command->info('   Competitions : UI UX, Gen AI, Web Design');
+        $this->command->info('   Users        : 10 dengan team & payment, 5 pendaftar seminar');
     }
 }
