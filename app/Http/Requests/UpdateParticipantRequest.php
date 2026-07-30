@@ -28,7 +28,7 @@ class UpdateParticipantRequest extends FormRequest
         $stringValidation = 'required|string|max:255';
         return [
             'fullName' => $stringValidation,
-            'grade' => [Rule::in([Grade::STUDENT, Grade::COLLEGE_STUDENT, Grade::PUBLIC]), 'required'],
+            'grade' => ['sometimes', Rule::in([Grade::STUDENT, Grade::COLLEGE_STUDENT, Grade::PUBLIC])],
             'institution' => 'string|max:255',
             'studentId' => 'max:255',
             'gender' => [Rule::in([Gender::MALE, Gender::FEMALE]), 'required'],

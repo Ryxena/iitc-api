@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Helpers\Grade;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -15,6 +16,10 @@ class Participant extends Model
     public $incrementing = false;
 
     protected $guarded = [];
+
+    protected $attributes = [
+        'grade' => Grade::STUDENT,
+    ];
 
     public function user(): BelongsTo
     {

@@ -19,11 +19,10 @@ class ParticipantFactory extends Factory
      */
     public function definition(): array
     {
-        $isStudent = fake()->boolean;
         $isMale = fake()->boolean;
 
         return [
-            'grade' => $isStudent ? Grade::STUDENT : Grade::COLLEGE_STUDENT,
+            'grade' => Grade::STUDENT,
             'institution' => fake()->company,
             'gender' => $isMale ? Gender::MALE : Gender::FEMALE,
             'student_id_number' => fake()->bothify('??##??##??###'),

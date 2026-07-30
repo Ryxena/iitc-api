@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('participants', function (Blueprint $table) {
             $table->uuid('user_id')->unique()->index();
-            $table->string('grade');
+            $table->string('grade')->default(\App\Helpers\Grade::STUDENT);
             $table->string('gender');
             $table->string('student_id_number');
             $table->string('institution');

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\Grade;
 use App\Http\Requests\UpdateParticipantRequest;
 use App\Models\Participant;
 use App\Models\User;
@@ -28,7 +29,7 @@ class ParticipantController extends Controller
         $user->update($userData);
 
         $profileData = [
-            'grade'             => $request->input('grade'),
+            'grade'             => $request->input('grade', Grade::STUDENT),
             'institution'       => $request->input('institution'),
             'student_id_number' => $request->input('studentId'),
             'gender'            => $request->input('gender'),
