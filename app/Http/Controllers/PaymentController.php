@@ -57,4 +57,26 @@ class PaymentController extends Controller
             'payment' => $payment,
         ]);
     }
+
+    public function showStatus(): JsonResponse
+    {
+        $team = TeamController::findUserTeam(auth()->user());
+        if (! $team) {
+            return $this->error('Team not found.', 404);
+        }
+
+        $team->load(['payment', 'paymentStatus']);
+
+        $paymentStatus = isset($team->payment) ? PaymentStatusHelper::PENDING : null;
+        $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
+        $reason = $team->paymentStatus->reason ?? null;
+
+        return $this->success('Succeed get payment status.', [
+            'payment' => [
+                'teamId' => $team->id,
+                'status' => $paymentStatus,
+                'reason' => $reason,
+            ],
+        ]);
+    }
 }

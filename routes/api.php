@@ -131,5 +131,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/teams/mine/members/{memberId}', DeleteTeamMemberController::class);
 
     // Payment
+    Route::get('/payment/mine/status', [PaymentController::class, 'showStatus']);
     Route::post('/payment/mine', [PaymentController::class, 'store']);
 });
