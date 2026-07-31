@@ -11,7 +11,9 @@ class Participant extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = null;
+    protected $primaryKey = 'user_id';
+
+    protected $keyType = 'string';
 
     public $incrementing = false;
 

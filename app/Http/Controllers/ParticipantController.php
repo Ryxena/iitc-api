@@ -31,7 +31,7 @@ class ParticipantController extends Controller
         $profileData = [
             'grade'             => $request->input('grade', Grade::STUDENT),
             'institution'       => $request->input('institution'),
-            'student_id_number' => $request->input('studentId'),
+            'student_id_number' => $request->input('studentId') ?? $request->input('student_id_number') ?? $request->input('student_id'),
             'gender'            => $request->input('gender'),
         ];
         
