@@ -136,6 +136,7 @@ class TeamController extends Controller
             'leader',
             'leader.participant:user_id,avatar',
             'members:id,name,email',
+            'members.participant:user_id,avatar',
             'competition',
         ]);
 
@@ -146,9 +147,10 @@ class TeamController extends Controller
 
         $members = $team->members->map(function ($member) {
             return [
-                'id'    => $member->id,
-                'name'  => $member->name,
-                'email' => $member->email,
+                'id'     => $member->id,
+                'name'   => $member->name,
+                'email'  => $member->email,
+                'avatar' => $member->participant->avatar ?? null,
             ];
         });
 
