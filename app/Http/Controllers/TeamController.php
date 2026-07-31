@@ -4,25 +4,26 @@ namespace App\Http\Controllers;
 
 use App\Helpers\PaymentStatus;
 use App\Http\Requests\StoreTeamRequest;
+use App\Http\Requests\SubmitTeamRequest;
 use App\Http\Requests\UpdateTeamRequest;
 use App\Models\Competition;
 use App\Models\Event;
 use App\Models\Team;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TeamController extends Controller
 {
     public function index(): JsonResponse
     {
         $this->authorize('viewAny', Team::class);
-        
+
         $eventActive = Event::query()->where('is_active', true)->first();
         if (! $eventActive) {
             return $this->error('No active event found.', 404);
         }
-        
+
         $competitionIds = Competition::query()->where('event_id', $eventActive->id)->pluck('id');
         $teams = Team::query()
             ->whereIn('competition_id', $competitionIds)
@@ -32,21 +33,21 @@ class TeamController extends Controller
                 'leader',
                 'competition',
             ])->get();
-            
+
         $teamsResponse = [];
         foreach ($teams as $team) {
             $paymentStatus = isset($team->payment) ? PaymentStatus::PENDING : null;
             $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
-            
+
             $teamsResponse[] = [
-                'id'              => $team->id,
-                'name'            => $team->name,
-                'code'            => $team->code,
-                'title'           => $team->title,
-                'isActive'        => $paymentStatus,
-                'isSubmit'        => isset($team->submission),
-                'avatar'          => $team->avatar,
-                'leaderName'      => $team->leader->name,
+                'id' => $team->id,
+                'name' => $team->name,
+                'code' => $team->code,
+                'title' => $team->title,
+                'isActive' => $paymentStatus,
+                'isSubmit' => isset($team->submission),
+                'avatar' => $team->avatar,
+                'leaderName' => $team->leader->name,
                 'competitionName' => $team->competition->name,
             ];
         }
@@ -58,7 +59,7 @@ class TeamController extends Controller
     {
         $this->authorize('create', Team::class);
         $competition = Competition::query()->where('slug', $competitionSlug)->firstOrFail();
-        
+
         // Business logic validation: check if user already has a team in this event (as leader or member)
         $userId = auth()->id();
         $hasTeamInEvent = Team::query()
@@ -78,15 +79,15 @@ class TeamController extends Controller
 
         $code = fake()->bothify('##??##??');
         $team = Team::query()->create([
-            'leader_id'      => $userId,
+            'leader_id' => $userId,
             'competition_id' => $competition->id,
-            'code'           => $code,
-            'name'           => $request->name,
+            'code' => $code,
+            'name' => $request->name,
         ]);
 
         return $this->success('Succeed create new team.', [
             'team' => [
-                'id'   => $team->id,
+                'id' => $team->id,
                 'code' => $team->code,
                 'name' => $team->name,
             ],
@@ -147,29 +148,29 @@ class TeamController extends Controller
 
         $members = $team->members->map(function ($member) {
             return [
-                'id'     => $member->id,
-                'name'   => $member->name,
-                'email'  => $member->email,
+                'id' => $member->id,
+                'name' => $member->name,
+                'email' => $member->email,
                 'avatar' => $member->participant->avatar ?? null,
             ];
         });
 
         $teamResponse = [
-            'id'             => $team->id,
-            'name'           => $team->name,
-            'code'           => $team->code,
-            'title'          => $team->title,
-            'isActive'       => $paymentStatus,
-            'isSubmit'       => isset($team->submission),
+            'id' => $team->id,
+            'name' => $team->name,
+            'code' => $team->code,
+            'title' => $team->title,
+            'isActive' => $paymentStatus,
+            'isSubmit' => isset($team->submission),
             'submissionLink' => $team->submission,
-            'avatar'         => $team->avatar,
-            'leader'         => [
-                'name'   => $team->leader->name,
-                'email'  => $team->leader->email,
+            'avatar' => $team->avatar,
+            'leader' => [
+                'name' => $team->leader->name,
+                'email' => $team->leader->email,
                 'avatar' => $team->leader->participant->avatar ?? null,
             ],
-            'members'        => $members,
-            'competition'    => $team->competition,
+            'members' => $members,
+            'competition' => $team->competition,
         ];
 
         return $this->success('Succeed get detail team.', ['team' => $teamResponse]);
@@ -185,7 +186,7 @@ class TeamController extends Controller
         $this->authorize('update', $team);
 
         $teamData = [
-            'name'  => $request->name,
+            'name' => $request->name,
             'title' => $request->title,
         ];
 
@@ -198,18 +199,36 @@ class TeamController extends Controller
             }
         }
 
-        if ($request->input('submission') !== null) {
-            $teamData['submission'] = $request->input('submission');
-        }
-
         $team->update($teamData);
 
         return $this->success('Succeed updated team.', [
             'team' => [
-                'id'     => $team->id,
-                'name'   => $team->name,
-                'title'  => $team->title,
+                'id' => $team->id,
+                'name' => $team->name,
+                'title' => $team->title,
                 'avatar' => $team->avatar,
+            ],
+        ]);
+    }
+
+    public function submit(SubmitTeamRequest $request): JsonResponse
+    {
+        $team = static::findUserTeam(auth()->user());
+        if (! $team) {
+            return $this->error('Team not found.', 404);
+        }
+
+        $this->authorize('submit', $team);
+
+        $team->update([
+            'submission' => $request->validated('submission'),
+        ]);
+
+        return $this->success('Succeed submitted team work.', [
+            'team' => [
+                'id' => $team->id,
+                'name' => $team->name,
+                'title' => $team->title,
                 'submission' => $team->submission,
             ],
         ]);

@@ -41,6 +41,12 @@ class TeamPolicy
                 && $user->id == $team->leader_id;
     }
 
+    public function submit(User $user, Team $team): bool
+    {
+        return $user->hasPermissionTo('Update Team')
+            && $user->id == $team->leader_id;
+    }
+
     /**
      * Determine whether the user can delete the model.
      */

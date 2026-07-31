@@ -123,6 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/teams', [TeamController::class, 'index']);
     Route::get('/teams/mine', [TeamController::class, 'show']);
     Route::post('/teams/mine/update', [TeamController::class, 'update']);
+    Route::post('/teams/mine/submission', [TeamController::class, 'submit']);
     Route::delete('/teams/mine', [TeamController::class, 'destroy']);
     Route::post('/teams/{competitionSlug}', [TeamController::class, 'store']);
     Route::put('/teams/join', [JoinTeamController::class, 'store']);
