@@ -19,11 +19,17 @@ class DummyDataSeeder extends Seeder
         $users = User::factory(10)->create();
         $teams = collect();
 
+        $competitionIds = \App\Models\Competition::pluck('id');
+        if ($competitionIds->isEmpty()) {
+            $this->call(CompetitionSeeder::class);
+            $competitionIds = \App\Models\Competition::pluck('id');
+        }
+
         foreach ($users as $user) {
             $user->assignRole('User');
             $team = Team::factory()->create([
-                'leader_id' => $user->id,
-                'competition_id' => fake()->numberBetween(1, 10),
+                'leader_id'      => $user->id,
+                'competition_id' => $competitionIds->random(),
             ]);
             $teams->push($team);
         }

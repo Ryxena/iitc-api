@@ -12,9 +12,13 @@ use Illuminate\Support\Facades\Storage;
 
 class PaymentController extends Controller
 {
-    public function store(StorePaymentRequest $request, string $teamId): JsonResponse
+    public function store(StorePaymentRequest $request): JsonResponse
     {
-        $team = Team::query()->findOrFail($teamId);
+        $team = TeamController::findUserTeam(auth()->user());
+        if (! $team) {
+            return $this->error('Team not found.', 404);
+        }
+
         $this->authorize('create', [Payment::class, new Payment, $team]);
 
         // Business logic validation: check if payment is already VALID
@@ -48,7 +52,7 @@ class PaymentController extends Controller
 
         return $this->success('success post proof of payment', [
             'team' => [
-                'teamId' => $teamId,
+                'teamId' => $team->id,
             ],
             'payment' => $payment,
         ]);

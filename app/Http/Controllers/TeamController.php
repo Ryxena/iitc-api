@@ -10,6 +10,7 @@ use App\Models\Event;
 use App\Models\Team;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Http\Request;
 
 class TeamController extends Controller
 {
@@ -92,23 +93,65 @@ class TeamController extends Controller
         ], 201);
     }
 
-    public function show(string $teamId): JsonResponse
+    public static function findUserTeam($user): ?Team
     {
-        $team = Team::query()->with([
+        $eventActive = Event::query()->where('is_active', true)->first();
+
+        $teamQuery = Team::query()
+            ->where(function ($query) use ($user) {
+                $query->where('leader_id', $user->id)
+                    ->orWhereHas('members', function ($q) use ($user) {
+                        $q->where('user_id', $user->id);
+                    });
+            });
+
+        $team = null;
+        if ($eventActive) {
+            $team = (clone $teamQuery)
+                ->whereHas('competition', function ($q) use ($eventActive) {
+                    $q->where('event_id', $eventActive->id);
+                })
+                ->first();
+        }
+
+        if (! $team) {
+            $team = $teamQuery->latest()->first();
+        }
+
+        return $team;
+    }
+
+    public function show(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $team = static::findUserTeam($user);
+
+        if (! $team) {
+            return $this->error('Team not found.', 404);
+        }
+
+        $team->load([
             'paymentStatus',
             'payment',
             'leader',
-            'leader.participant:avatar',
+            'leader.participant:user_id,avatar',
             'members:id,name,email',
-            'members.participant:user_id,avatar',
             'competition',
-        ])->findOrFail($teamId);
-        
+        ]);
+
         $this->authorize('view', $team);
 
         $paymentStatus = isset($team->payment) ? PaymentStatus::PENDING : null;
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
-        
+
+        $members = $team->members->map(function ($member) {
+            return [
+                'id'    => $member->id,
+                'name'  => $member->name,
+                'email' => $member->email,
+            ];
+        });
+
         $teamResponse = [
             'id'             => $team->id,
             'name'           => $team->name,
@@ -123,22 +166,27 @@ class TeamController extends Controller
                 'email'  => $team->leader->email,
                 'avatar' => $team->leader->participant->avatar ?? null,
             ],
-            'members'        => $team->members,
+            'members'        => $members,
+            'competition'    => $team->competition,
         ];
 
         return $this->success('Succeed get detail team.', ['team' => $teamResponse]);
     }
 
-    public function update(UpdateTeamRequest $request, string $teamId): JsonResponse
+    public function update(UpdateTeamRequest $request): JsonResponse
     {
-        $team = Team::query()->findOrFail($teamId);
+        $team = static::findUserTeam(auth()->user());
+        if (! $team) {
+            return $this->error('Team not found.', 404);
+        }
+
         $this->authorize('update', $team);
-        
+
         $teamData = [
             'name'  => $request->name,
             'title' => $request->title,
         ];
-        
+
         if ($request->file('avatar') !== null) {
             $oldAvatar = $team->avatar;
             $avatar = $request->file('avatar')->store('team/avatar', ['disk' => 'public']);
@@ -160,16 +208,22 @@ class TeamController extends Controller
                 'name'   => $team->name,
                 'title'  => $team->title,
                 'avatar' => $team->avatar,
+                'submission' => $team->submission,
             ],
         ]);
     }
 
-    public function destroy(string $teamId): JsonResponse
+    public function destroy(): JsonResponse
     {
-        $team = Team::query()->findOrFail($teamId);
+        $team = static::findUserTeam(auth()->user());
+        if (! $team) {
+            return $this->error('Team not found.', 404);
+        }
+
         $this->authorize('delete', $team);
+        $deletedTeamId = $team->id;
         $team->delete();
 
-        return $this->success('Succeed delete team.', ['teamId' => $teamId]);
+        return $this->success('Succeed delete team.', ['teamId' => $deletedTeamId]);
     }
 }

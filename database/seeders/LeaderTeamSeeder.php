@@ -23,7 +23,7 @@ class LeaderTeamSeeder extends Seeder
     {
         // ── 1. Leader ──────────────────────────────────────────────────────────
         $leader = User::firstOrCreate(
-            ['email' => 'user@gmail.com'],
+            ['email' => 'useryeat@gmail.com'],
             [
                 'name'              => 'Team Leader',
                 'password'          => 'myPassword',
@@ -82,11 +82,16 @@ class LeaderTeamSeeder extends Seeder
         }
 
         // ── 3. Team ────────────────────────────────────────────────────────────
-        // Pick competition_id = 1 (ensure CompetitionSeeder / CategorySeeder ran first)
+        $competition = \App\Models\Competition::first();
+        if (! $competition) {
+            $this->call(CompetitionSeeder::class);
+            $competition = \App\Models\Competition::first();
+        }
+
         $team = Team::firstOrCreate(
             [
                 'leader_id'      => $leader->id,
-                'competition_id' => 1,
+                'competition_id' => $competition->id,
             ],
             [
                 'name'      => 'Team Alpha',

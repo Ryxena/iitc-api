@@ -9,6 +9,7 @@ use App\Http\Controllers\DeleteTeamMemberController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\JoinIndividualCompetitionController;
 use App\Http\Controllers\JoinTeamController;
+use App\Http\Controllers\LeaveTeamController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\NewPasswordController;
@@ -120,13 +121,14 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Teams
     Route::get('/teams', [TeamController::class, 'index']);
+    Route::get('/teams/mine', [TeamController::class, 'show']);
+    Route::post('/teams/mine/update', [TeamController::class, 'update']);
+    Route::delete('/teams/mine', [TeamController::class, 'destroy']);
     Route::post('/teams/{competitionSlug}', [TeamController::class, 'store']);
-    Route::get('/teams/{teamId}', [TeamController::class, 'show']);
-    Route::post('/teams/{teamId}/update', [TeamController::class, 'update']);
-    Route::delete('/teams/{teamId}', [TeamController::class, 'destroy']);
     Route::put('/teams/join', [JoinTeamController::class, 'store']);
-    Route::delete('/teams/{teamId}/members/{memberId}', DeleteTeamMemberController::class);
+    Route::delete('/teams/mine/leave', LeaveTeamController::class);
+    Route::delete('/teams/mine/members/{memberId}', DeleteTeamMemberController::class);
 
     // Payment
-    Route::post('/payment/{teamId}', [PaymentController::class, 'store']);
+    Route::post('/payment/mine', [PaymentController::class, 'store']);
 });
