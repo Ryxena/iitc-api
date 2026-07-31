@@ -145,6 +145,7 @@ class TeamController extends Controller
 
         $paymentStatus = isset($team->payment) ? PaymentStatus::PENDING : null;
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
+        $reason = $team->paymentStatus->reason ?? null;
 
         $members = $team->members->map(function ($member) {
             return [
@@ -161,6 +162,10 @@ class TeamController extends Controller
             'code' => $team->code,
             'title' => $team->title,
             'isActive' => $paymentStatus,
+            'paymentStatus' => [
+                'status' => $paymentStatus,
+                'reason' => $reason,
+            ],
             'isSubmit' => isset($team->submission),
             'submissionLink' => $team->submission,
             'avatar' => $team->avatar,

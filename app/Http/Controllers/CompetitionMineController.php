@@ -57,7 +57,7 @@ class CompetitionMineController extends Controller
             'avatar'          => $team->avatar,
             'isSubmit'        => isset($team->submission),
             'maxMembers'      => $team->competition->max_members,
-            'currentMembers'  => $team->members_count,
+            'currentMembers'  => $team->members_count + 1,
             'isActive'        => $paymentStatus,
         ];
     }

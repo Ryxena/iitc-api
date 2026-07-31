@@ -91,7 +91,7 @@ class TeamController extends Controller
             'avatar'          => $team->avatar,
             'isSubmit'        => isset($team->submission),
             'maxMembers'      => $team->competition->max_members,
-            'currentMembers'  => $team->members_count,
+            'currentMembers'  => $team->members_count + 1,
             'leader'          => [
                 'name'    => $team->leader->name,
                 'phone'   => $team->leader->phone,

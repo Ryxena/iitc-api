@@ -191,8 +191,8 @@
                         <dd class="text-sm font-medium text-main">{{ $team->title ?? '—' }}</dd>
                     </div>
                     <div class="flex justify-between items-center py-2 border-b" style="border-color: var(--border)">
-                        <dt class="text-sm text-muted">Anggota</dt>
-                        <dd class="text-sm font-medium text-main">{{ $team->members->count() }} orang</dd>
+                        <dt class="text-sm text-muted">Total Anggota</dt>
+                        <dd class="text-sm font-medium text-main">{{ $team->members->count() + 1 }} orang (termasuk ketua)</dd>
                     </div>
                     <div class="flex justify-between items-center py-2">
                         <dt class="text-sm text-muted">Submission</dt>

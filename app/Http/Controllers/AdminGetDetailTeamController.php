@@ -24,12 +24,17 @@ class AdminGetDetailTeamController extends Controller
         
         $paymentStatus = isset($team->payment) ? PaymentStatus::PENDING : null;
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
+        $reason = $team->paymentStatus->reason ?? null;
         
         $teamResponse = [
             'name'            => $team->name,
             'code'            => $team->code,
             'title'           => $team->title,
             'isActive'        => $paymentStatus,
+            'paymentStatus'   => [
+                'status' => $paymentStatus,
+                'reason' => $reason,
+            ],
             'isSubmit'        => isset($team->submission),
             'avatar'          => $team->avatar,
             'transferReceipt' => $team->payment->transfer_receipt ?? null,

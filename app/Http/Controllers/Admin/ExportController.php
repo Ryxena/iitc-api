@@ -63,7 +63,7 @@ class ExportController extends Controller
                     $team->leader->email ?? '-',
                     $team->leader->phone ?? '-',
                     $team->leader->participant->institution ?? '-',
-                    $team->members_count,
+                    $team->members_count + 1,
                     $team->paymentStatus->status ?? 'BELUM UPLOAD',
                     $team->created_at->format('d/m/Y H:i'),
                 ]);

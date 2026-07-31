@@ -113,7 +113,7 @@
 
                             {{-- Anggota --}}
                             <td class="text-center" style="border-right: none;">
-                                <span class="text-sm font-semibold text-main">{{ $team->members_count }}</span>
+                                <span class="text-sm font-semibold text-main">{{ $team->members_count + 1 }}</span>
                                 <span class="text-xs text-muted">/{{ $team->competition->max_members ?? '?' }}</span>
                             </td>
 
