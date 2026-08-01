@@ -15,6 +15,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if(Auth::user()?->hasRole('Super Admin'))
+                        <x-nav-link :href="route('admin.seminars.index')" :active="request()->routeIs('admin.seminars.*')">
+                            {{ __('Kelola Seminar') }}
+                        </x-nav-link>
+                    @endif
                 </div>
             </div>
 
@@ -67,6 +72,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @if(Auth::user()?->hasRole('Super Admin'))
+                <x-responsive-nav-link :href="route('admin.seminars.index')" :active="request()->routeIs('admin.seminars.*')">
+                    {{ __('Kelola Seminar') }}
+                </x-responsive-nav-link>
+            @endif
         </div>
 
         <!-- Responsive Settings Options -->

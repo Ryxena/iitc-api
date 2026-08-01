@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminCompetitionController;
+use App\Http\Controllers\Admin\AdminSeminarManagementController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportController as AdminExportController;
@@ -60,7 +61,14 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::patch('/competitions/{slug}', [AdminCompetitionController::class, 'update'])->name('competitions.update');
         Route::delete('/competitions/{slug}', [AdminCompetitionController::class, 'destroy'])->name('competitions.destroy');
 
-        // Seminar management
+        // Seminar CRUD management
+        Route::get('/seminars', [AdminSeminarManagementController::class, 'index'])->name('seminars.index');
+        Route::post('/seminars', [AdminSeminarManagementController::class, 'store'])->name('seminars.store');
+        Route::patch('/seminars/{seminar}', [AdminSeminarManagementController::class, 'update'])->name('seminars.update');
+        Route::delete('/seminars/{seminar}', [AdminSeminarManagementController::class, 'destroy'])->name('seminars.destroy');
+        Route::patch('/seminars/{seminar}/toggle-active', [AdminSeminarManagementController::class, 'toggleActive'])->name('seminars.toggle-active');
+
+        // Seminar participant management & verify
         Route::get('/seminar', [SeminarAdminController::class, 'index'])->name('seminar.index');
         Route::post('/seminar/{userId}/verify', [SeminarAdminController::class, 'verify'])->name('seminar.verify');
         Route::post('/seminar/bulk-verify', [SeminarAdminController::class, 'bulkVerify'])->name('seminar.bulk-verify');

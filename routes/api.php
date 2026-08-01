@@ -17,6 +17,7 @@ use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\PasswordResetLinkController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentStatusController;
+use App\Http\Controllers\PublicSeminarController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SeminarController;
 use App\Http\Controllers\TeamController;
@@ -50,6 +51,10 @@ Route::get('/competitions', [CompetitionController::class, 'index']);
 Route::get('/competitions/categories', [CategoryController::class, 'index']);
 Route::get('/competitions/mine', CompetitionMineController::class)->middleware('auth:sanctum');
 Route::get('/competitions/{slug}', [CompetitionController::class, 'show']);
+
+// Seminars (public read)
+Route::get('/seminars', [PublicSeminarController::class, 'index']);
+Route::get('/seminars/{id}', [PublicSeminarController::class, 'show']);
 
 // ============================================================
 // AUTHENTICATED ROUTES (auth:sanctum)

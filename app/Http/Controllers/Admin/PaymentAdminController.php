@@ -28,7 +28,6 @@ class PaymentAdminController extends Controller
 
         $query = Team::query()
             ->whereIn('competition_id', $competitionIds)
-            ->whereHas('payment')
             ->with(['competition', 'leader', 'payment', 'paymentStatus'])
             ->withCount('members');
 

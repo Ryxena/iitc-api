@@ -130,7 +130,9 @@
                             {{-- Status --}}
                             <td style="border-right: none;">
                                 @php $ps = $team->paymentStatus?->status; @endphp
-                                @if($ps === 'VALID')
+                                @if(! $team->payment)
+                                    <span class="badge" style="background: #F3F4F6; color: #6B7280; border: 1px solid #E5E7EB;">Belum Upload</span>
+                                @elseif($ps === 'VALID')
                                     <span class="badge badge-valid">Valid</span>
                                 @elseif($ps === 'INVALID')
                                     <span class="badge badge-invalid text-red-700" style="background: #FEF2F2; color: #B91C1C; border-color: #FECACA;">Ditolak</span>
