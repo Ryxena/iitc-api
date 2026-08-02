@@ -184,7 +184,7 @@
 
     function openEditModal(data) {
         const form = document.getElementById('form-edit');
-        form.action = '/admin/competitions/' + data.slug;
+        form.action = '/public/admin/competitions/' + data.slug;
 
         form.querySelector('[name="name"]').value         = data.name;
         form.querySelector('[name="deadline"]').value     = data.deadline;
