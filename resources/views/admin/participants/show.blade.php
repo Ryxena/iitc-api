@@ -42,6 +42,10 @@
                 </div>
                 <dl class="space-y-1 mb-4">
                     <div class="flex justify-between py-2 border-b" style="border-color: var(--border)">
+                        <dt class="text-sm text-muted">Email</dt>
+                        <dd class="text-sm font-medium text-main">{{ $participant->user->email ?? '—' }}</dd>
+                    </div>
+                    <div class="flex justify-between py-2 border-b" style="border-color: var(--border)">
                         <dt class="text-sm text-muted">No. HP</dt>
                         <dd class="text-sm font-medium text-main">
                             <a href="https://wa.me/{{ preg_replace('/^0/', '62', $participant->user->phone ?? '') }}" target="_blank" class="text-indigo-600 hover:underline">{{ $participant->user->phone ?? '—' }}</a>
@@ -52,8 +56,42 @@
                         <dd class="text-sm font-medium text-main">{{ $participant->institution ?? '—' }}</dd>
                     </div>
                     <div class="flex justify-between py-2 border-b" style="border-color: var(--border)">
-                        <dt class="text-sm text-muted">Angkatan</dt>
+                        <dt class="text-sm text-muted">Angkatan / Kelas</dt>
                         <dd class="text-sm font-medium text-main">{{ $participant->grade ?? '—' }}</dd>
+                    </div>
+                    <div class="flex justify-between py-2 border-b" style="border-color: var(--border)">
+                        <dt class="text-sm text-muted">Jenis Kelamin</dt>
+                        <dd class="text-sm font-medium text-main">
+                            @php
+                                $genderMap = [
+                                    'laki-laki' => 'Laki-laki',
+                                    'perempuan'  => 'Perempuan',
+                                    'L'          => 'Laki-laki',
+                                    'P'          => 'Perempuan',
+                                ];
+                                $genderDisplay = $genderMap[$participant->gender ?? ''] ?? ($participant->gender ?? '—');
+                            @endphp
+                            @if($participant->gender)
+                                <span class="inline-flex items-center gap-1.5">
+                                    @if(in_array(strtolower($participant->gender), ['laki-laki', 'l']))
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M16 3h5m0 0v5m0-5l-6.5 6.5M9 3a6 6 0 100 12A6 6 0 009 3z"/>
+                                        </svg>
+                                    @elseif(in_array(strtolower($participant->gender), ['perempuan', 'p']))
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-pink-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 15a6 6 0 100-12 6 6 0 000 12zm0 0v3m0 3h0m-3-3h6"/>
+                                        </svg>
+                                    @endif
+                                    {{ $genderDisplay }}
+                                </span>
+                            @else
+                                —
+                            @endif
+                        </dd>
+                    </div>
+                    <div class="flex justify-between py-2 border-b" style="border-color: var(--border)">
+                        <dt class="text-sm text-muted">No. Identitas Siswa / NIM</dt>
+                        <dd class="text-sm font-medium text-main font-mono tracking-wide">{{ $participant->student_id_number ?? '—' }}</dd>
                     </div>
                     <div class="flex justify-between py-2 border-b" style="border-color: var(--border)">
                         <dt class="text-sm text-muted">Tim Lomba</dt>

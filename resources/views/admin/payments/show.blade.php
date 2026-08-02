@@ -105,7 +105,7 @@
                     <form
                         method="POST"
                         action="{{ route('admin.payments.update', $team->id) }}"
-                        onsubmit="return confirm(isApprove == 1 ? 'Approve payment tim ini?' : 'Tolak payment tim ini?')"
+                        @submit.prevent="if (confirm(isApprove == 1 ? 'Approve payment tim ini?' : 'Tolak payment tim ini?')) $el.submit()"
                     >
                         @csrf
                         @method('PATCH')
@@ -113,7 +113,7 @@
                         {{-- Pilihan --}}
                         <div class="grid grid-cols-2 gap-3 mb-5">
                             <label>
-                                <input type="radio" name="is_approve" value="1" id="radio-approve" class="sr-only" required>
+                                <input type="radio" name="is_approve" value="1" id="radio-approve" class="sr-only" required @change="isApprove = 1">
                                 <div class="selectable-card">
                                     <div class="icon-ring">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon-check" viewBox="0 0 20 20" fill="currentColor">
@@ -125,7 +125,7 @@
                                 </div>
                             </label>
                             <label>
-                                <input type="radio" name="is_approve" value="0" id="radio-reject" class="sr-only" required>
+                                <input type="radio" name="is_approve" value="0" id="radio-reject" class="sr-only" required @change="isApprove = 0">
                                 <div class="selectable-card">
                                      <div class="icon-ring">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="icon-check" viewBox="0 0 20 20" fill="currentColor">
