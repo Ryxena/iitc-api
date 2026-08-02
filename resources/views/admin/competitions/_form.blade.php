@@ -55,6 +55,25 @@
         <textarea name="description" rows="3" class="form-input" placeholder="Deskripsi singkat kompetisi...">{{ old('description', $comp?->description) }}</textarea>
     </div>
 
+    {{-- Cover Image --}}
+    <div style="grid-column: 1 / -1;">
+        <label class="block text-sm font-medium mb-1.5" style="color: var(--text-muted)">Cover Kompetisi (opsional)</label>
+        <input type="file" name="cover" accept="image/*" class="form-input" style="padding: 6px 14px;"
+               onchange="previewCompCover(this)">
+        <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Format: JPG, PNG, WebP. Maks 3MB.</p>
+        {{-- Live preview for new upload --}}
+        <img id="comp-cover-preview" src="" alt="Preview"
+             style="display:none; max-height:140px; margin-top:10px; border-radius:8px; object-fit:cover; border:1px solid var(--border);">
+        {{-- Current cover shown in edit mode --}}
+        @if($comp?->cover)
+            <div style="margin-top:8px;">
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">Cover saat ini:</p>
+                <img src="{{ $comp->cover }}" alt="Current cover"
+                     style="max-height:100px; border-radius:8px; object-fit:cover; border:1px solid var(--border);">
+            </div>
+        @endif
+    </div>
+
     {{-- Categories --}}
     @if($allCategories->isNotEmpty())
         <div style="grid-column: 1 / -1;">
@@ -74,3 +93,14 @@
     @endif
 
 </div>
+
+<script>
+function previewCompCover(input) {
+    const preview = document.getElementById('comp-cover-preview');
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>

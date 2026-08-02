@@ -21,14 +21,7 @@ class CompetitionSeeder extends Seeder
             [
                 'name'        => 'UI UX',
                 'slug'        => 'ui-ux',
-                'description' => 'Lomba UI/UX Design merupakan sebuah kompetisi yang bertujuan untuk menguji
-kreativitas, kemampuan analisis, serta keterampilan peserta dalam merancang
-antarmuka (User Interface) dan pengalaman pengguna (User Experience) yang inovatif,
-fungsional, dan berorientasi pada kebutuhan pengguna. Dalam perlombaan ini, peserta
-diharapkan mampu menghasilkan rancangan solusi digital berupa prototype
-menggunakan perangkat desain seperti Figma atau tools sejenis, dengan
-mengedepankan kemudahan penggunaan, estetika visual, serta penyelesaian masalah
-sesuai dengan tema yang telah ditentukan.',
+                'description' => 'Kompetisi merancang UI/UX inovatif dan fungsional berupa prototype (Figma/tools sejenis), mengutamakan usability, estetika visual, dan solusi sesuai tema.',
                 'guide_book'  => 'https://example.com/guidebook/ui-ux.pdf',
                 'price'       => 45000,
                 'max_members' => 3,
@@ -37,13 +30,7 @@ sesuai dengan tema yang telah ditentukan.',
             [
                 'name'        => 'Gen AI',
                 'slug'        => 'gen-ai',
-                'description' => 'Lomba Gen AI (Generative AI Video) merupakan sebuah kompetisi yang
-bertujuan untuk menguji kreativitas, kemampuan bercerita (storytelling), serta
-keterampilan peserta dalam memanfaatkan teknologi Generative Artificial Intelligence
-(GenAI) untuk menghasilkan sebuah video yang inovatif, informatif, dan menarik.
-Dalam perlombaan ini, peserta diharapkan mampu mengembangkan ide, menyusun
-alur cerita, membuat prompt yang efektif, serta mengintegrasikan berbagai teknologi
-AI generatif untuk menghasilkan video yang orisinal sesuai dengan tema.',
+                'description' => 'Kompetisi kreativitas dan storytelling menggunakan Generative AI untuk menciptakan video orisinal, inovatif, dan sesuai tema mulai dari ide, alur cerita, hingga prompt engineering.',
                 'guide_book'  => 'https://example.com/guidebook/gen-ai.pdf',
                 'price'       => 45000,
                 'max_members' => 3,
@@ -52,13 +39,8 @@ AI generatif untuk menghasilkan video yang orisinal sesuai dengan tema.',
             [
                 'name'        => 'Web Design',
                 'slug'        => 'web-design',
-                'description' => 'Lomba Web Design merupakan sebuah kompetisi yang bertujuan untuk menguji
-kreativitas, keterampilan, dan pengetahuan peserta dalam merancang serta membangun
-sebuah website yang interaktif dan menarik secara visual. Dalam perlombaan ini,
-peserta diharapkan mampu merancang antarmuka (front-end) suatu website dan
-diperbolehkan menggunakan framework/library front-end apapun dengan catatan
-murni hasil rancangan sendiri dan bukan menggunakan template jadi.',
-                'guide_book'  => 'https://example.com/guidebook/web-design.pdf',
+                'description' => 'Kompetisi merancang website interaktif dan visual menarik, fokus front-end, bebas framework/library, dengan desain orisinal tanpa template.',
+                'guide_book'  => 'https://drive.google.com/file/d/1yEVONs2ohXLQEPAM4QrBdd6WT_ZBbse6/view?usp=sharing',
                 'price'       => 45000,
                 'max_members' => 3,
                 'deadline'    => '2026-08-15 23:59:59',

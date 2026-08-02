@@ -11,6 +11,7 @@ use App\Models\Event;
 use App\Models\TechStack;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class AdminCompetitionController extends Controller
@@ -51,7 +52,14 @@ class AdminCompetitionController extends Controller
             'event_id'       => ['required', 'exists:events,id'],
             'categories'     => ['nullable', 'array'],
             'categories.*'   => ['exists:categories,id'],
+            'cover'          => ['nullable', 'image', 'max:3072'],
         ]);
+
+        $coverUrl = null;
+        if ($request->hasFile('cover')) {
+            $path     = $request->file('cover')->store('competition/cover', ['disk' => 'public']);
+            $coverUrl = Storage::disk('public')->url($path);
+        }
 
         $competition = Competition::query()->create([
             'name'        => $data['name'],
@@ -61,7 +69,7 @@ class AdminCompetitionController extends Controller
             'description' => $data['description'] ?? null,
             'guide_book'  => $data['guide_book'] ?? null,
             'event_id'    => $data['event_id'],
-            'cover'       => null,
+            'cover'       => $coverUrl,
         ]);
 
         if (! empty($data['categories'])) {
@@ -88,16 +96,29 @@ class AdminCompetitionController extends Controller
             'guide_book'   => ['nullable', 'string', 'max:500'],
             'categories'   => ['nullable', 'array'],
             'categories.*' => ['exists:categories,id'],
+            'cover'        => ['nullable', 'image', 'max:3072'],
         ]);
 
-        $competition->update([
+        $updateData = [
             'name'        => $data['name'],
             'deadline'    => $data['deadline'],
             'max_members' => $data['max_members'],
             'price'       => $data['price'],
             'description' => $data['description'] ?? null,
             'guide_book'  => $data['guide_book'] ?? null,
-        ]);
+        ];
+
+        if ($request->hasFile('cover')) {
+            // Delete old cover if stored locally
+            if ($competition->cover) {
+                $oldPath = ltrim(str_replace('/storage', '', parse_url($competition->cover, PHP_URL_PATH)), '/');
+                Storage::disk('public')->delete($oldPath);
+            }
+            $path = $request->file('cover')->store('competition/cover', ['disk' => 'public']);
+            $updateData['cover'] = Storage::disk('public')->url($path);
+        }
+
+        $competition->update($updateData);
 
         // Sync categories
         $categoryIds = $data['categories'] ?? [];

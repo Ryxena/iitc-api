@@ -35,6 +35,7 @@
             <table style="border: none;">
                 <thead>
                     <tr>
+                        <th style="border-right: none; width: 80px;">Cover</th>
                         <th style="border-right: none;">Kompetisi</th>
                         <th style="border-right: none;">Kategori</th>
                         <th class="text-center" style="border-right: none;">Tim</th>
@@ -47,6 +48,22 @@
                 <tbody>
                     @foreach($competitions as $comp)
                         <tr>
+                            {{-- Cover --}}
+                            <td style="border-right: none; width: 80px;">
+                                @if($comp->cover)
+                                    <img src="{{ $comp->cover }}" alt="{{ $comp->name }}"
+                                         class="rounded-lg object-cover"
+                                         style="width: 56px; height: 40px; background: rgba(255,255,255,.06); border: 1px solid var(--border);">
+                                @else
+                                    <div class="rounded-lg flex items-center justify-center"
+                                         style="width: 56px; height: 40px; background: rgba(255,255,255,.06); border: 1px solid var(--border);">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" style="color: var(--text-muted)" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                        </svg>
+                                    </div>
+                                @endif
+                            </td>
+
                             {{-- Name + slug --}}
                             <td style="border-right: none;">
                                 <p class="font-semibold text-main text-sm">{{ $comp->name }}</p>
@@ -102,6 +119,7 @@
                                                 'price'       => $comp->price,
                                                 'description' => $comp->description,
                                                 'guide_book'  => $comp->guide_book,
+                                                'cover'       => $comp->cover,
                                                 'categories'  => $comp->categories->pluck('id')->toArray(),
                                             ]) }})">
                                         Edit
@@ -133,7 +151,7 @@
                 <button type="button" onclick="closeModal('modal-create')" style="color: var(--text-muted); background:none; border:none; cursor:pointer; font-size:20px;">✕</button>
             </div>
 
-            <form method="POST" action="{{ route('admin.competitions.store') }}">
+            <form method="POST" action="{{ route('admin.competitions.store') }}" enctype="multipart/form-data">
                 @csrf
                 @include('admin.competitions._form', ['comp' => null, 'allCategories' => $allCategories, 'allEvents' => $allEvents, 'activeEvent' => $activeEvent])
                 <div class="flex justify-end gap-3 mt-6">
@@ -154,7 +172,7 @@
                 <button type="button" onclick="closeModal('modal-edit')" style="color: var(--text-muted); background:none; border:none; cursor:pointer; font-size:20px;">✕</button>
             </div>
 
-            <form id="form-edit" method="POST" action="">
+            <form id="form-edit" method="POST" action="" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
                 @include('admin.competitions._form', ['comp' => null, 'allCategories' => $allCategories, 'allEvents' => $allEvents, 'activeEvent' => $activeEvent])
@@ -184,7 +202,7 @@
 
     function openEditModal(data) {
         const form = document.getElementById('form-edit');
-        form.action = '/public/admin/competitions/' + data.slug;
+        form.action = '/admin/competitions/' + data.slug;
 
         form.querySelector('[name="name"]').value         = data.name;
         form.querySelector('[name="deadline"]').value     = data.deadline;
@@ -192,6 +210,12 @@
         form.querySelector('[name="price"]').value        = data.price;
         form.querySelector('[name="description"]').value  = data.description ?? '';
         form.querySelector('[name="guide_book"]').value   = data.guide_book ?? '';
+
+        // Reset cover file input and live preview
+        const coverInput = form.querySelector('[name="cover"]');
+        if (coverInput) coverInput.value = '';
+        const coverPreview = document.getElementById('comp-cover-preview');
+        if (coverPreview) { coverPreview.src = ''; coverPreview.style.display = 'none'; }
 
         // Reset and re-check categories
         form.querySelectorAll('[name="categories[]"]').forEach(cb => {
