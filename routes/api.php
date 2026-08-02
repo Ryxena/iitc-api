@@ -17,7 +17,9 @@ use App\Http\Controllers\ParticipantController;
 use App\Http\Controllers\PasswordResetLinkController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PaymentStatusController;
+use App\Http\Controllers\PublicMediaPartnerController;
 use App\Http\Controllers\PublicSeminarController;
+use App\Http\Controllers\PublicSponsorController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SeminarController;
 use App\Http\Controllers\TeamController;
@@ -55,6 +57,12 @@ Route::get('/competitions/{slug}', [CompetitionController::class, 'show']);
 // Seminars (public read)
 Route::get('/seminars', [PublicSeminarController::class, 'index']);
 Route::get('/seminars/{id}', [PublicSeminarController::class, 'show']);
+
+// Sponsors (public read, sorted by tier)
+Route::get('/sponsors', PublicSponsorController::class);
+
+// Media Partners (public read)
+Route::get('/media-partners', PublicMediaPartnerController::class);
 
 // ============================================================
 // AUTHENTICATED ROUTES (auth:sanctum)

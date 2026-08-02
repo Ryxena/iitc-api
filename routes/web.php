@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminCompetitionController;
+use App\Http\Controllers\Admin\AdminMediaPartnerController;
 use App\Http\Controllers\Admin\AdminSeminarManagementController;
 use App\Http\Controllers\Admin\AdminParticipantRecapController;
+use App\Http\Controllers\Admin\AdminSponsorController;
 use App\Http\Controllers\Admin\AdminTeamRecapController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -88,6 +90,18 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
         // Export seminars
         Route::get('/export/seminars', [AdminExportController::class, 'seminars'])->name('export.seminars');
+
+        // Media Partners
+        Route::get('/media-partners', [AdminMediaPartnerController::class, 'index'])->name('media-partners.index');
+        Route::post('/media-partners', [AdminMediaPartnerController::class, 'store'])->name('media-partners.store');
+        Route::post('/media-partners/{mediaPartner}', [AdminMediaPartnerController::class, 'update'])->name('media-partners.update');
+        Route::delete('/media-partners/{mediaPartner}', [AdminMediaPartnerController::class, 'destroy'])->name('media-partners.destroy');
+
+        // Sponsors
+        Route::get('/sponsors', [AdminSponsorController::class, 'index'])->name('sponsors.index');
+        Route::post('/sponsors', [AdminSponsorController::class, 'store'])->name('sponsors.store');
+        Route::post('/sponsors/{sponsor}', [AdminSponsorController::class, 'update'])->name('sponsors.update');
+        Route::delete('/sponsors/{sponsor}', [AdminSponsorController::class, 'destroy'])->name('sponsors.destroy');
     });
 });
 
