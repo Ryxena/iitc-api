@@ -72,8 +72,7 @@ class AdminCompetitionController extends Controller
             CategoryCompetition::query()->insert($pivotData);
         }
 
-        return redirect()->route('admin.competitions.index')
-            ->with('success', "Kompetisi \"{$competition->name}\" berhasil ditambahkan.");
+        return redirect()->back()->with('success', "Kompetisi \"{$competition->name}\" berhasil ditambahkan.");
     }
 
     public function update(Request $request, string $slug): RedirectResponse
@@ -104,8 +103,7 @@ class AdminCompetitionController extends Controller
         $categoryIds = $data['categories'] ?? [];
         $competition->categories()->sync($categoryIds);
 
-        return redirect()->route('admin.competitions.index')
-            ->with('success', "Kompetisi \"{$competition->name}\" berhasil diperbarui.");
+        return redirect()->back()->with('success', "Kompetisi \"{$competition->name}\" berhasil diperbarui.");
     }
 
     public function destroy(string $slug): RedirectResponse
@@ -114,7 +112,6 @@ class AdminCompetitionController extends Controller
         $name        = $competition->name;
         $competition->delete();
 
-        return redirect()->route('admin.competitions.index')
-            ->with('success', "Kompetisi \"{$name}\" berhasil dihapus.");
+        return redirect()->back()->with('success', "Kompetisi \"{$name}\" berhasil dihapus.");
     }
 }

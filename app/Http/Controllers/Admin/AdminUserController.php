@@ -85,7 +85,7 @@ class AdminUserController extends Controller
             ]);
         }
 
-        return redirect()->route('admin.users.index')->with('success', "Data user \"{$user->name}\" berhasil diperbarui.");
+        return redirect()->back()->with('success', "Data user \"{$user->name}\" berhasil diperbarui.");
     }
 
     public function destroy(string $userId): RedirectResponse
@@ -93,6 +93,6 @@ class AdminUserController extends Controller
         $user = User::query()->findOrFail($userId);
         $user->delete();
 
-        return redirect()->route('admin.users.index')->with('success', "User \"{$user->name}\" berhasil dihapus.");
+        return redirect()->back()->with('success', "User \"{$user->name}\" berhasil dihapus.");
     }
 }
