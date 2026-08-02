@@ -38,7 +38,11 @@ class AdminParticipantRecapController extends Controller
     public function show($id): View
     {
         // Participant table uses user_id as its primary identifier in relationships
-        $participant = Participant::with(['user', 'user.teams.competition', 'user.asMembers.competition'])
+        $participant = Participant::with([
+            'user',
+            'user.teams.competition',
+            'user.asMembers.competition',
+        ])
             ->where('user_id', $id)
             ->firstOrFail();
 

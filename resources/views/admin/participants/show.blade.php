@@ -92,58 +92,63 @@
                     Dokumen Upload
                 </h2>
                 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {{-- Twibbon --}}
-                    <div class="border rounded-xl p-4 bg-gray-50 flex flex-col items-center justify-center text-center">
-                        <p class="text-sm font-bold text-gray-700 mb-3">Twibbon</p>
-                        @if($participant->twibbon)
-                            <div class="w-full aspect-square bg-gray-200 rounded-lg overflow-hidden mb-3 border border-gray-300">
-                                <img src="/storage/{{ $participant->twibbon }}" alt="Twibbon" class="w-full h-full object-cover">
-                            </div>
-                            <a href="/storage/{{ $participant->twibbon }}" target="_blank" class="w-full inline-flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium text-xs py-2 rounded-lg transition-colors shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                                Lihat Penuh
-                            </a>
-                        @else
-                            <div class="w-full aspect-square bg-gray-100 rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 mb-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                                </svg>
-                                <span class="text-xs">Belum diupload</span>
-                            </div>
-                        @endif
-                    </div>
-
-                    {{-- Kartu Identitas --}}
-                    <div class="border rounded-xl p-4 bg-gray-50 flex flex-col items-center justify-center text-center">
-                        <p class="text-sm font-bold text-gray-700 mb-3">Kartu Identitas</p>
-                        @if($participant->photo_identity)
-                            <div class="w-full aspect-video bg-gray-200 rounded-lg overflow-hidden mb-3 border border-gray-300">
-                                <img src="/storage/{{ $participant->photo_identity }}" alt="Kartu Identitas" class="w-full h-full object-cover">
-                            </div>
-                            <a href="/storage/{{ $participant->photo_identity }}" target="_blank" class="w-full inline-flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium text-xs py-2 rounded-lg transition-colors shadow-sm">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                                Lihat Penuh
-                            </a>
-                        @else
-                            <div class="w-full aspect-video bg-gray-100 rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 mb-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                </svg>
-                                <span class="text-xs">Belum diupload</span>
-                            </div>
-                        @endif
-                    </div>
+                {{-- Twibbon --}}
+                <div class="border rounded-xl p-4 bg-gray-50 flex flex-col items-center justify-center text-center">
+                    <p class="text-sm font-bold text-gray-700 mb-3">Twibbon</p>
+                    @if($participant->twibbon)
+                        <div class="w-full aspect-square bg-gray-200 rounded-lg overflow-hidden mb-3 border border-gray-300">
+                            <img src="{{ $participant->twibbon }}" alt="Twibbon" class="w-full h-full object-cover cursor-zoom-in" onclick="showImageModal('{{ $participant->twibbon }}')">
+                        </div>
+                        <a href="{{ $participant->twibbon }}" target="_blank" class="w-full inline-flex items-center justify-center gap-2 bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium text-xs py-2 rounded-lg transition-colors shadow-sm" style="text-decoration: none;">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                            </svg>
+                            Lihat Penuh
+                        </a>
+                    @else
+                        <div class="w-full aspect-square bg-gray-100 rounded-lg border border-dashed border-gray-300 flex flex-col items-center justify-center text-gray-400 mb-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="text-xs">Belum diupload</span>
+                        </div>
+                    @endif
                 </div>
 
             </div>
 
+
+
         </div>
 
     </div>
+
+    {{-- ============================================================ --}}
+    {{-- IMAGE LIGHTBOX MODAL --}}
+    {{-- ============================================================ --}}
+    <div id="img-modal"
+         class="hidden fixed inset-0 z-50 flex items-center justify-center p-4"
+         style="background: rgba(17, 24, 39, 0.7); backdrop-filter: blur(4px)"
+         onclick="this.classList.add('hidden')">
+        <img id="modal-img-src" src=""
+             class="max-w-full max-h-full rounded-lg shadow-2xl cursor-zoom-out"
+             alt="Preview Dokumen">
+        <button
+            id="btn-close-modal"
+            onclick="document.getElementById('img-modal').classList.add('hidden')"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full flex items-center justify-center text-white bg-black bg-opacity-50 hover:bg-opacity-80 transition-colors"
+            style="border: none;">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        function showImageModal(src) {
+            document.getElementById('modal-img-src').src = src;
+            document.getElementById('img-modal').classList.remove('hidden');
+        }
+    </script>
 
 </x-admin-layout>
