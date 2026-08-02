@@ -131,13 +131,13 @@
                             <td style="border-right: none;">
                                 @php $ps = $team->paymentStatus?->status; @endphp
                                 @if(! $team->payment)
-                                    <span class="badge" style="background: #F3F4F6; color: #6B7280; border: 1px solid #E5E7EB;">Belum Upload</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border-none outline-none">Belum Upload</span>
                                 @elseif($ps === 'VALID')
-                                    <span class="badge badge-valid">Valid</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 border-none outline-none">Valid</span>
                                 @elseif($ps === 'INVALID')
-                                    <span class="badge badge-invalid text-red-700" style="background: #FEF2F2; color: #B91C1C; border-color: #FECACA;">Ditolak</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 border-none outline-none">Ditolak</span>
                                 @else
-                                    <span class="badge badge-pending">Pending</span>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 border-none outline-none">Pending</span>
                                 @endif
                             </td>
 

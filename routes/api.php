@@ -118,11 +118,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/individual/{competitionSlug}', JoinIndividualCompetitionController::class);
 
     // Seminar
-    Route::get('/seminar', [SeminarController::class, 'index']);
-    Route::post('/seminar/register', [SeminarController::class, 'register']);
-    Route::get('/seminar/{userId}', [SeminarController::class, 'show']);
-    Route::post('/seminar/{userId}/verify-attendance', [SeminarController::class, 'verifyAttendance']);
-    Route::get('/seminar/{userId}/certificate', [SeminarController::class, 'downloadCertificate']);
+    // Route::get('/seminar', [SeminarController::class, 'index']);
+    // Route::post('/seminar/register', [SeminarController::class, 'register']);
+    // Route::get('/seminar/{userId}', [SeminarController::class, 'show']);
+    // Route::post('/seminar/{userId}/verify-attendance', [SeminarController::class, 'verifyAttendance']);
+    // Route::get('/seminar/{userId}/certificate', [SeminarController::class, 'downloadCertificate']);
 
     // Teams
     Route::get('/teams', [TeamController::class, 'index']);

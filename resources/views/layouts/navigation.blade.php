@@ -15,6 +15,11 @@
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                         {{ __('Dashboard') }}
                     </x-nav-link>
+                    @if(Auth::user()?->hasRole('Super Admin') || Auth::user()?->hasRole('Admin'))
+                        <x-nav-link :href="route('admin.teams.recap')" :active="request()->routeIs('admin.teams.recap*')">
+                            {{ __('Recap & LPJ') }}
+                        </x-nav-link>
+                    @endif
                     @if(Auth::user()?->hasRole('Super Admin'))
                         <x-nav-link :href="route('admin.seminars.index')" :active="request()->routeIs('admin.seminars.*')">
                             {{ __('Kelola Seminar') }}
@@ -72,6 +77,11 @@
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
+            @if(Auth::user()?->hasRole('Super Admin') || Auth::user()?->hasRole('Admin'))
+                <x-responsive-nav-link :href="route('admin.teams.recap')" :active="request()->routeIs('admin.teams.recap*')">
+                    {{ __('Recap & LPJ') }}
+                </x-responsive-nav-link>
+            @endif
             @if(Auth::user()?->hasRole('Super Admin'))
                 <x-responsive-nav-link :href="route('admin.seminars.index')" :active="request()->routeIs('admin.seminars.*')">
                     {{ __('Kelola Seminar') }}

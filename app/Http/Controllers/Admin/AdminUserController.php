@@ -47,6 +47,47 @@ class AdminUserController extends Controller
         return view('admin.users.index', compact('users', 'search', 'competitions', 'competitionId', 'activeEvent'));
     }
 
+    public function edit(string $userId): View
+    {
+        $user = User::with('participant')->findOrFail($userId);
+        return view('admin.users.edit', compact('user'));
+    }
+
+    public function update(Request $request, string $userId): RedirectResponse
+    {
+        $user = User::findOrFail($userId);
+
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'email'       => 'required|email|max:255|unique:users,email,' . $user->id,
+            'phone'       => 'nullable|string|max:20',
+            'password'    => 'nullable|string|min:8',
+            'institution' => 'nullable|string|max:255',
+            'grade'       => 'nullable|string|max:50',
+        ]);
+
+        $updateData = [
+            'name'  => $validated['name'],
+            'email' => $validated['email'],
+            'phone' => $validated['phone'],
+        ];
+
+        if (!empty($validated['password'])) {
+            $updateData['password'] = bcrypt($validated['password']);
+        }
+
+        $user->update($updateData);
+
+        if ($user->participant) {
+            $user->participant->update([
+                'institution' => $validated['institution'],
+                'grade'       => $validated['grade'],
+            ]);
+        }
+
+        return redirect()->route('admin.users.index')->with('success', "Data user \"{$user->name}\" berhasil diperbarui.");
+    }
+
     public function destroy(string $userId): RedirectResponse
     {
         $user = User::query()->findOrFail($userId);

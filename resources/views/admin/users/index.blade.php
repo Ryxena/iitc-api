@@ -107,14 +107,20 @@
 
                             {{-- Aksi --}}
                             <td style="border-right: none; text-align: right;">
-                                <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}"
-                                      onsubmit="return confirm('Hapus user {{ addslashes($user->name) }}? Tindakan ini tidak bisa dibatalkan.')">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button id="btn-delete-user-{{ $user->id }}" type="submit" class="btn-danger" style="padding: 5px 12px; font-size: 12px;">
-                                        Hapus
-                                    </button>
-                                </form>
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ route('admin.users.edit', $user->id) }}"
+                                       class="btn-ghost" style="padding: 5px 12px; font-size: 12px;">
+                                        Edit
+                                    </a>
+                                    <form method="POST" action="{{ route('admin.users.destroy', $user->id) }}"
+                                          onsubmit="return confirm('Hapus user {{ addslashes($user->name) }}? Tindakan ini tidak bisa dibatalkan.')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button id="btn-delete-user-{{ $user->id }}" type="submit" class="btn-danger" style="padding: 5px 12px; font-size: 12px;">
+                                            Hapus
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     @endforeach

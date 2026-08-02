@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\Admin\AdminCompetitionController;
 use App\Http\Controllers\Admin\AdminSeminarManagementController;
+use App\Http\Controllers\Admin\AdminParticipantRecapController;
+use App\Http\Controllers\Admin\AdminTeamRecapController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportController as AdminExportController;
@@ -45,6 +47,15 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/payments/{teamId}', [PaymentAdminController::class, 'show'])->name('payments.show');
     Route::patch('/payments/{teamId}', [PaymentAdminController::class, 'update'])->name('payments.update');
 
+    // Participant Competition Recap (Admin + Super Admin)
+    Route::get('/teams-recap', [AdminTeamRecapController::class, 'index'])->name('teams.recap');
+    Route::get('/teams-recap/export', [AdminTeamRecapController::class, 'export'])->name('teams.recap.export');
+    Route::get('/teams-recap/{id}', [AdminTeamRecapController::class, 'show'])->name('teams.recap.show');
+    
+    // Individual Recap
+    Route::get('/participants-recap', [AdminParticipantRecapController::class, 'index'])->name('participants.recap');
+    Route::get('/participants-recap/{id}', [AdminParticipantRecapController::class, 'show'])->name('participants.recap.show');
+
     // Export teams (Admin + Super Admin)
     Route::get('/export/teams', [AdminExportController::class, 'teams'])->name('export.teams');
 
@@ -53,6 +64,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
 
         // Users
         Route::get('/users', [AdminUserController::class, 'index'])->name('users.index');
+        Route::get('/users/{userId}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
+        Route::patch('/users/{userId}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{userId}', [AdminUserController::class, 'destroy'])->name('users.destroy');
 
         // Competitions

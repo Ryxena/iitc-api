@@ -86,6 +86,15 @@
         }
         .btn-ghost:hover   { background: #F9FAFB; border-color: #D1D5DB; }
 
+        .btn-action {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: var(--radius-md);
+            background: #fff; border: 1px solid var(--border); color: var(--text-muted);
+            transition: all 0.2s; box-shadow: var(--shadow-sm); text-decoration: none;
+        }
+        .btn-action:hover {
+            background: var(--bg-base); color: var(--accent); border-color: var(--accent);
+        }
         /* Table */
         table { width: 100%; border-collapse: collapse; }
         thead th { padding: 12px 16px; text-align: left; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); border-bottom: 1px solid var(--border); }
@@ -137,8 +146,11 @@
         .gap-6 { gap: 24px; }
         .grid { display: grid; }
         .flex { display: flex; }
+        .inline-flex { display: inline-flex; }
+        .flex-col { flex-direction: column; }
         .items-center { align-items: center; }
         .items-start { align-items: flex-start; }
+        .items-end { align-items: flex-end; }
         .justify-between { justify-content: space-between; }
         .justify-center { justify-content: center; }
         .flex-1 { flex: 1; }
@@ -197,9 +209,11 @@
         .w-4 { width: 16px; }
         .w-5 { width: 20px; }
         .w-8 { width: 32px; }
+        .w-16 { width: 64px; }
         .h-4 { height: 16px; }
         .h-5 { height: 20px; }
         .h-8 { height: 32px; }
+        .h-16 { height: 64px; }
         .h-full { height: 100%; }
         .border-t { border-top: 1px solid var(--border); }
         .transition-all { transition: all .2s; }
@@ -265,6 +279,22 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 Validasi Payment
+            </a>
+
+            <a href="{{ route('admin.teams.recap') }}"
+               class="nav-link {{ request()->routeIs('admin.teams.recap*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                </svg>
+                Recap Team
+            </a>
+
+            <a href="{{ route('admin.participants.recap') }}"
+               class="nav-link {{ request()->routeIs('admin.participants.recap*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:20px;height:20px;flex-shrink:0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                </svg>
+                Rekap Individu
             </a>
 
             <a href="{{ route('admin.export.teams') }}"
