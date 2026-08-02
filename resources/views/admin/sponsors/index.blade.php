@@ -278,8 +278,8 @@
 
         form.querySelector('[name="name"]').value = data.name ?? '';
 
-        // Pre-select the tier pill
-        if (data.tier) { selectTier(data.tier); }
+        // Set tier select value
+        form.querySelector('[name="tier"]').value = data.tier ?? '';
 
         // Reset file input
         const fileInput = form.querySelector('[name="image"]');
