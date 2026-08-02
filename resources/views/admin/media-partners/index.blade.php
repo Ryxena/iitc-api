@@ -94,7 +94,7 @@
 
                             {{-- Nama --}}
                             <td style="border-right: none;">
-                                <p class="font-semibold text-sm text-white">{{ $mp->name }}</p>
+                                <p class="font-semibold text-sm">{{ $mp->name }}</p>
                             </td>
 
                             {{-- Ditambahkan --}}
@@ -143,7 +143,7 @@
     <div id="modal-create-mp" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); overflow-y:auto;">
         <div class="modal-panel" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; max-width: 520px; margin: 60px auto; padding: 32px;">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="font-bold text-white text-lg">Tambah Media Partner</h2>
+                <h2 class="font-bold text-lg">Tambah Media Partner</h2>
                 <button type="button" onclick="closeModal('modal-create-mp')" style="color: var(--text-muted); background:none; border:none; cursor:pointer; font-size:20px;">✕</button>
             </div>
 
@@ -164,7 +164,7 @@
     <div id="modal-edit-mp" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); overflow-y:auto;">
         <div class="modal-panel" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; max-width: 520px; margin: 60px auto; padding: 32px;">
             <div class="flex items-center justify-between mb-6">
-                <h2 class="font-bold text-white text-lg">Edit Media Partner</h2>
+                <h2 class="font-bold text-lg">Edit Media Partner</h2>
                 <button type="button" onclick="closeModal('modal-edit-mp')" style="color: var(--text-muted); background:none; border:none; cursor:pointer; font-size:20px;">✕</button>
             </div>
 

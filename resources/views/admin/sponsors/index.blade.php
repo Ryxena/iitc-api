@@ -154,7 +154,7 @@
 
                             {{-- Nama --}}
                             <td style="border-right: none;">
-                                <p class="font-semibold text-sm text-white">{{ $sp->name }}</p>
+                                <p class="font-semibold text-sm">{{ $sp->name }}</p>
                             </td>
 
                             {{-- Tier --}}
