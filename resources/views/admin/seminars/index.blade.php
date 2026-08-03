@@ -291,7 +291,7 @@
 
     function openEditSeminarModal(data) {
         const form = document.getElementById('form-edit-seminar');
-        form.action = '/admin/seminars/' + data.id;
+        form.action = '/public/admin/seminars/' + data.id;
 
         form.querySelector('[name="title"]').value       = data.title ?? '';
         form.querySelector('[name="speaker"]').value     = data.speaker ?? '';
