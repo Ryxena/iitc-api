@@ -22,14 +22,18 @@ class PublicSeminarController extends Controller
         }
 
         $seminars = $query->get()->map(fn (Seminar $seminar) => [
-            'id'          => $seminar->id,
-            'title'       => $seminar->title,
-            'description' => $seminar->description,
-            'speaker'     => $seminar->speaker,
-            'dateTime'    => $seminar->date_time ? $seminar->date_time->toIso8601String() : null,
-            'location'    => $seminar->location,
-            'isActive'    => $seminar->is_active,
-            'createdAt'   => $seminar->created_at->toIso8601String(),
+            'id'                => $seminar->id,
+            'title'             => $seminar->title,
+            'description'       => $seminar->description,
+            'speaker'           => $seminar->speaker,
+            'dateTime'          => $seminar->date_time ? $seminar->date_time->toIso8601String() : null,
+            'startDate'         => $seminar->start_date ? $seminar->start_date->toDateString() : null,
+            'endDate'           => $seminar->end_date ? $seminar->end_date->toDateString() : null,
+            'location'          => $seminar->location,
+            'registrationLink'  => $seminar->registration_link,
+            'posterUrl'         => $seminar->poster ? \Illuminate\Support\Facades\Storage::disk('public')->url($seminar->poster) : null,
+            'isActive'          => $seminar->is_active,
+            'createdAt'         => $seminar->created_at->toIso8601String(),
         ]);
 
         return $this->success('success get seminar data', [
@@ -50,14 +54,18 @@ class PublicSeminarController extends Controller
 
         return $this->success('success get detail seminar', [
             'seminar' => [
-                'id'          => $seminar->id,
-                'title'       => $seminar->title,
-                'description' => $seminar->description,
-                'speaker'     => $seminar->speaker,
-                'dateTime'    => $seminar->date_time ? $seminar->date_time->toIso8601String() : null,
-                'location'    => $seminar->location,
-                'isActive'    => $seminar->is_active,
-                'createdAt'   => $seminar->created_at->toIso8601String(),
+                'id'                => $seminar->id,
+                'title'             => $seminar->title,
+                'description'       => $seminar->description,
+                'speaker'           => $seminar->speaker,
+                'dateTime'          => $seminar->date_time ? $seminar->date_time->toIso8601String() : null,
+                'startDate'         => $seminar->start_date ? $seminar->start_date->toDateString() : null,
+                'endDate'           => $seminar->end_date ? $seminar->end_date->toDateString() : null,
+                'location'          => $seminar->location,
+                'registrationLink'  => $seminar->registration_link,
+                'posterUrl'         => $seminar->poster ? \Illuminate\Support\Facades\Storage::disk('public')->url($seminar->poster) : null,
+                'isActive'          => $seminar->is_active,
+                'createdAt'         => $seminar->created_at->toIso8601String(),
             ],
         ]);
     }

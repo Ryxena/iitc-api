@@ -35,8 +35,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Admin role middleware alias
         $middleware->alias([
-            'admin'       => \App\Http\Middleware\EnsureIsAdmin::class,
-            'super-admin' => \App\Http\Middleware\EnsureIsSuperAdmin::class,
+            'admin'            => \App\Http\Middleware\EnsureIsAdmin::class,
+            'super-admin'      => \App\Http\Middleware\EnsureIsSuperAdmin::class,
+            'incremental-rate' => \App\Http\Middleware\IncrementalRateLimit::class,
         ]);
 
         // Redirect unauthenticated web requests to the web login page
@@ -73,6 +74,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 422);
             }
         });
+
 
         $exceptions->render(function (HttpException $e, Request $request) {
             if ($request->is('api/*')) {

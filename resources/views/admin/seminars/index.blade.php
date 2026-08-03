@@ -29,7 +29,7 @@
             </div>
         </div>
 
-        <button id="btn-open-create-seminar" type="button" class="btn-primary flex items-center gap-2" onclick="openModal('modal-create-seminar')">
+        <button id="btn-open-create-seminar" type="button" class="btn-primary flex items-center gap-2" onclick="openCreateSeminarModal()">
             <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"/>
             </svg>
@@ -107,12 +107,19 @@
 
                             {{-- Judul & Deskripsi --}}
                             <td style="border-right: none; max-width: 260px;">
-                                <p class="font-semibold text-main text-sm">{{ $sem->title }}</p>
-                                @if($sem->description)
-                                    <p class="text-xs text-muted mt-0.5 line-clamp-2" title="{{ $sem->description }}">
-                                        {{ Str::limit($sem->description, 80) }}
-                                    </p>
-                                @endif
+                                <div class="flex items-start gap-3">
+                                    @if($sem->poster)
+                                        <img src="{{ Storage::disk('public')->url($sem->poster) }}" alt="Poster" class="w-12 h-12 object-cover rounded shadow-sm flex-shrink-0">
+                                    @endif
+                                    <div>
+                                        <p class="font-semibold text-main text-sm">{{ $sem->title }}</p>
+                                        @if($sem->description)
+                                            <p class="text-xs text-muted mt-0.5 line-clamp-2" title="{{ $sem->description }}">
+                                                {{ Str::limit($sem->description, 80) }}
+                                            </p>
+                                        @endif
+                                    </div>
+                                </div>
                             </td>
 
                             {{-- Pembicara --}}
@@ -127,6 +134,18 @@
                                     <p class="text-xs text-muted mt-0.5">{{ $sem->date_time->format('H:i') }} WIB</p>
                                 @else
                                     <span class="text-xs text-muted">—</span>
+                                @endif
+                                
+                                @if($sem->start_date || $sem->end_date)
+                                    <div class="mt-2 pt-2 border-t" style="border-color: var(--border);">
+                                        <p class="text-xs text-muted">Registrasi:</p>
+                                        @if($sem->start_date)
+                                            <p class="text-xs text-main">Buka: {{ $sem->start_date->format('d M Y') }}</p>
+                                        @endif
+                                        @if($sem->end_date)
+                                            <p class="text-xs text-main">Tutup: {{ $sem->end_date->format('d M Y') }}</p>
+                                        @endif
+                                    </div>
                                 @endif
                             </td>
 
@@ -164,9 +183,13 @@
                                                 'title'       => $sem->title,
                                                 'speaker'     => $sem->speaker,
                                                 'date_time'   => $sem->date_time ? $sem->date_time->format('Y-m-d\TH:i') : '',
+                                                'start_date'  => $sem->start_date ? $sem->start_date->format('Y-m-d') : '',
+                                                'end_date'    => $sem->end_date ? $sem->end_date->format('Y-m-d') : '',
                                                 'location'    => $sem->location,
+                                                'registration_link' => $sem->registration_link,
                                                 'description' => $sem->description,
                                                 'is_active'   => $sem->is_active,
+                                                'poster_url'  => $sem->poster ? Storage::disk('public')->url($sem->poster) : null,
                                             ]) }})">
                                         Edit
                                     </button>
@@ -206,7 +229,7 @@
                 <button type="button" onclick="closeModal('modal-create-seminar')" style="color: var(--text-muted); background:none; border:none; cursor:pointer; font-size:20px;">✕</button>
             </div>
 
-            <form method="POST" action="{{ route('admin.seminars.store') }}">
+            <form method="POST" action="{{ route('admin.seminars.store') }}" enctype="multipart/form-data">
                 @csrf
                 @include('admin.seminars._form')
                 <div class="flex justify-end gap-3 mt-6">
@@ -227,7 +250,7 @@
                 <button type="button" onclick="closeModal('modal-edit-seminar')" style="color: var(--text-muted); background:none; border:none; cursor:pointer; font-size:20px;">✕</button>
             </div>
 
-            <form id="form-edit-seminar" method="POST" action="">
+            <form id="form-edit-seminar" method="POST" action="" enctype="multipart/form-data">
                 @csrf
                 @method('PATCH')
                 @include('admin.seminars._form')
@@ -254,6 +277,18 @@
         });
     });
 
+    function openCreateSeminarModal() {
+        const modal = document.getElementById('modal-create-seminar');
+        const form = modal.querySelector('form');
+        form.reset();
+        
+        // Hide preview container in create form
+        const previewContainer = form.querySelector('.poster-preview-container');
+        if (previewContainer) previewContainer.classList.add('hidden');
+        
+        openModal('modal-create-seminar');
+    }
+
     function openEditSeminarModal(data) {
         const form = document.getElementById('form-edit-seminar');
         form.action = '/admin/seminars/' + data.id;
@@ -261,9 +296,26 @@
         form.querySelector('[name="title"]').value       = data.title ?? '';
         form.querySelector('[name="speaker"]').value     = data.speaker ?? '';
         form.querySelector('[name="date_time"]').value   = data.date_time ?? '';
+        form.querySelector('[name="start_date"]').value  = data.start_date ?? '';
+        form.querySelector('[name="end_date"]').value    = data.end_date ?? '';
         form.querySelector('[name="location"]').value    = data.location ?? '';
+        form.querySelector('[name="registration_link"]').value = data.registration_link ?? '';
         form.querySelector('[name="description"]').value = data.description ?? '';
         form.querySelector('[name="is_active"]').checked = Boolean(data.is_active);
+
+        // Poster Preview logic
+        const previewContainer = form.querySelector('.poster-preview-container');
+        const previewImg = form.querySelector('.poster-preview-img');
+        const deleteCheckbox = form.querySelector('.delete-poster-checkbox');
+        
+        if (data.poster_url) {
+            previewImg.src = data.poster_url;
+            previewContainer.classList.remove('hidden');
+            deleteCheckbox.checked = false;
+        } else {
+            previewContainer.classList.add('hidden');
+            previewImg.src = '';
+        }
 
         openModal('modal-edit-seminar');
     }

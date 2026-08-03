@@ -42,8 +42,8 @@ Route::get('/', fn () => 'ok! @iitc');
 //     throw new Exception('My first Sentry error!');
 // });
 
-Route::post('/login', [LoginController::class, 'store'])->name('login');
-Route::post('/register', [RegisterController::class, 'store'])->name('register');
+Route::post('/login', [LoginController::class, 'store'])->name('login')->middleware('incremental-rate:login');
+Route::post('/register', [RegisterController::class, 'store'])->name('register')->middleware('incremental-rate:register');
 Route::post('/forgot-password', [PasswordResetLinkController::class, 'store']);
 Route::post('/reset-password', [NewPasswordController::class, 'store']);
 
