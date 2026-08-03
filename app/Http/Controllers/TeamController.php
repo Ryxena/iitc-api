@@ -218,13 +218,13 @@ class TeamController extends Controller
 
     public function submit(SubmitTeamRequest $request): JsonResponse
     {
-        $now = now();
-        $startSubmission = \Carbon\Carbon::parse(date('Y') . '-08-19 00:00:00');
-        $endSubmission = \Carbon\Carbon::parse(date('Y') . '-08-28 23:59:59');
+        // $now = now();
+        // $startSubmission = \Carbon\Carbon::parse(date('Y') . '-08-19 00:00:00');
+        // $endSubmission = \Carbon\Carbon::parse(date('Y') . '-08-28 23:59:59');
 
-        if ($now->lt($startSubmission) || $now->gt($endSubmission)) {
-            return $this->error('Submit karya hanya boleh dilakukan pada tanggal 19-28 Agustus.', 400);
-        }
+        // if ($now->lt($startSubmission) || $now->gt($endSubmission)) {
+        //     return $this->error('Submit karya hanya boleh dilakukan pada tanggal 19-28 Agustus.', 400);
+        // }
 
         $team = static::findUserTeam(auth()->user());
         if (! $team) {
