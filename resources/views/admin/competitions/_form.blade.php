@@ -56,22 +56,28 @@
     </div>
 
     {{-- Cover Image --}}
-    <div style="grid-column: 1 / -1;">
+    <div style="grid-column: 1 / -1;" class="cover-input-container">
         <label class="block text-sm font-medium mb-1.5" style="color: var(--text-muted)">Cover Kompetisi (opsional)</label>
-        <input type="file" name="cover" accept="image/*" class="form-input" style="padding: 6px 14px;"
+        <input type="file" name="cover" accept="image/*" class="form-input comp-cover-input" style="padding: 6px 14px;"
                onchange="previewCompCover(this)">
         <p style="font-size:12px; color:var(--text-muted); margin-top:4px;">Format: JPG, PNG, WebP. Maks 3MB.</p>
+        
         {{-- Live preview for new upload --}}
-        <img id="comp-cover-preview" src="" alt="Preview"
+        <img class="comp-cover-preview" src="" alt="Preview"
              style="display:none; max-height:140px; margin-top:10px; border-radius:8px; object-fit:cover; border:1px solid var(--border);">
+             
         {{-- Current cover shown in edit mode --}}
-        @if($comp?->cover)
-            <div style="margin-top:8px;">
-                <p style="font-size:12px; color:var(--text-muted); margin-bottom:4px;">Cover saat ini:</p>
-                <img src="{{ $comp->cover }}" alt="Current cover"
+        <div class="current-cover-container" style="display: none; margin-top: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: rgba(255,255,255,.02);">
+            <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">Cover saat ini:</p>
+            <div class="flex items-start gap-4">
+                <img class="current-cover-img" src="" alt="Current cover"
                      style="max-height:100px; border-radius:8px; object-fit:cover; border:1px solid var(--border);">
+                <label class="flex items-center gap-2 cursor-pointer mt-1">
+                    <input type="checkbox" name="delete_cover" value="1" style="accent-color: #f87171;">
+                    <span class="text-sm" style="color: #f87171;">Hapus cover</span>
+                </label>
             </div>
-        @endif
+        </div>
     </div>
 
     {{-- Categories --}}
@@ -96,11 +102,15 @@
 
 <script>
 function previewCompCover(input) {
-    const preview = document.getElementById('comp-cover-preview');
+    const container = input.closest('.cover-input-container');
+    const preview = container.querySelector('.comp-cover-preview');
     if (input.files && input.files[0]) {
         const reader = new FileReader();
         reader.onload = e => { preview.src = e.target.result; preview.style.display = 'block'; };
         reader.readAsDataURL(input.files[0]);
+    } else {
+        preview.src = '';
+        preview.style.display = 'none';
     }
 }
 </script>

@@ -214,8 +214,23 @@
         // Reset cover file input and live preview
         const coverInput = form.querySelector('[name="cover"]');
         if (coverInput) coverInput.value = '';
-        const coverPreview = document.getElementById('comp-cover-preview');
+        const coverPreview = form.querySelector('.comp-cover-preview');
         if (coverPreview) { coverPreview.src = ''; coverPreview.style.display = 'none'; }
+
+        // Show current cover if exists
+        const currentCoverContainer = form.querySelector('.current-cover-container');
+        const currentCoverImg = form.querySelector('.current-cover-img');
+        const deleteCoverCheckbox = form.querySelector('[name="delete_cover"]');
+        
+        if (currentCoverContainer && currentCoverImg && deleteCoverCheckbox) {
+            deleteCoverCheckbox.checked = false;
+            if (data.cover) {
+                currentCoverImg.src = data.cover;
+                currentCoverContainer.style.display = 'block';
+            } else {
+                currentCoverContainer.style.display = 'none';
+            }
+        }
 
         // Reset and re-check categories
         form.querySelectorAll('[name="categories[]"]').forEach(cb => {

@@ -97,6 +97,7 @@ class AdminCompetitionController extends Controller
             'categories'   => ['nullable', 'array'],
             'categories.*' => ['exists:categories,id'],
             'cover'        => ['nullable', 'image', 'max:3072'],
+            'delete_cover' => ['nullable', 'boolean'],
         ]);
 
         $updateData = [
@@ -116,6 +117,13 @@ class AdminCompetitionController extends Controller
             }
             $path = $request->file('cover')->store('competition/cover', ['disk' => 'public']);
             $updateData['cover'] = Storage::disk('public')->url($path);
+        } elseif (!empty($data['delete_cover'])) {
+            // Delete cover without replacing
+            if ($competition->cover) {
+                $oldPath = ltrim(str_replace('/storage', '', parse_url($competition->cover, PHP_URL_PATH)), '/');
+                Storage::disk('public')->delete($oldPath);
+            }
+            $updateData['cover'] = null;
         }
 
         $competition->update($updateData);
