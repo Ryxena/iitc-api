@@ -11,7 +11,7 @@ use Illuminate\View\View;
 
 class AdminSponsorController extends Controller
 {
-    private const TIERS = ['platinum', 'gold', 'silver', 'bronze'];
+    private const TIERS = ['platinum', 'gold', 'silver', 'bronze', 'in-kind'];
 
     public function index(Request $request): View
     {
@@ -43,7 +43,7 @@ class AdminSponsorController extends Controller
     {
         $validated = $request->validate([
             'name'  => ['required', 'string', 'max:255'],
-            'tier'  => ['required', 'in:platinum,gold,silver,bronze'],
+            'tier'  => ['required', 'in:platinum,gold,silver,bronze,in-kind'],
             'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
@@ -61,7 +61,7 @@ class AdminSponsorController extends Controller
     {
         $validated = $request->validate([
             'name'  => ['required', 'string', 'max:255'],
-            'tier'  => ['required', 'in:platinum,gold,silver,bronze'],
+            'tier'  => ['required', 'in:platinum,gold,silver,bronze,in-kind'],
             'image' => ['nullable', 'image', 'max:2048'],
         ]);
 

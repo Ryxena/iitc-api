@@ -6,6 +6,7 @@
             'gold'     => ['label' => '🥇 Gold',     'style' => 'background: rgba(245,158,11,.15); color: #fbbf24; border: 1px solid rgba(245,158,11,.3);'],
             'silver'   => ['label' => '🥈 Silver',   'style' => 'background: rgba(148,163,184,.15); color: #94a3b8; border: 1px solid rgba(148,163,184,.3);'],
             'bronze'   => ['label' => '🥉 Bronze',   'style' => 'background: rgba(180,83,9,.15); color: #fb923c; border: 1px solid rgba(180,83,9,.3);'],
+            'in-kind'  => ['label' => '🤝 In-Kind',  'style' => 'background: rgba(34,197,94,.15); color: #4ade80; border: 1px solid rgba(34,197,94,.3);'],
         ];
     @endphp
 
@@ -79,7 +80,7 @@
         <div class="flex flex-wrap items-center gap-4">
             {{-- Tier filter tabs --}}
             <div style="display: flex; gap: 4px; padding: 4px; border-radius: 8px; border: 1px solid var(--border); background: #F9FAFB;">
-                @foreach(['ALL' => 'Semua', 'platinum' => '💎 Platinum', 'gold' => '🥇 Gold', 'silver' => '🥈 Silver', 'bronze' => '🥉 Bronze'] as $val => $label)
+                @foreach(['ALL' => 'Semua', 'platinum' => '💎 Platinum', 'gold' => '🥇 Gold', 'silver' => '🥈 Silver', 'bronze' => '🥉 Bronze', 'in-kind' => '🤝 In-Kind'] as $val => $label)
                     <a href="{{ route('admin.sponsors.index', ['tier' => $val, 'search' => $search]) }}"
                        class="tier-tab {{ strtolower($tier) === strtolower($val) ? 'tier-active' : '' }}">
                         {{ $label }}

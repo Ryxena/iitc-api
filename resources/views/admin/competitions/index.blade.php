@@ -119,6 +119,7 @@
                                                 'price'       => $comp->price,
                                                 'description' => $comp->description,
                                                 'guide_book'  => $comp->guide_book,
+                                                'group_wa'    => $comp->group_wa,
                                                 'cover'       => $comp->cover,
                                                 'categories'  => $comp->categories->pluck('id')->toArray(),
                                             ]) }})">
@@ -210,6 +211,7 @@
         form.querySelector('[name="price"]').value        = data.price;
         form.querySelector('[name="description"]').value  = data.description ?? '';
         form.querySelector('[name="guide_book"]').value   = data.guide_book ?? '';
+        form.querySelector('[name="group_wa"]').value     = data.group_wa ?? '';
 
         // Reset cover file input and live preview
         const coverInput = form.querySelector('[name="cover"]');

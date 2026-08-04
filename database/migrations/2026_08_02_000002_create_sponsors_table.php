@@ -11,7 +11,7 @@ return new class extends Migration
         Schema::create('sponsors', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->enum('tier', ['platinum', 'gold', 'silver', 'bronze']);
+            $table->enum('tier', ['platinum', 'gold', 'silver', 'bronze', 'in-kind']);
             $table->string('image', 500)->nullable();
             $table->timestamps();
         });

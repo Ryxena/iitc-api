@@ -18,6 +18,7 @@
             <option value="gold">🥇 Gold</option>
             <option value="silver">🥈 Silver</option>
             <option value="bronze">🥉 Bronze</option>
+            <option value="in-kind">🤝 In-Kind</option>
         </select>
     </div>
 

@@ -7,12 +7,12 @@ use Illuminate\Http\JsonResponse;
 
 class PublicSponsorController extends Controller
 {
-    private const TIER_ORDER = ['platinum' => 1, 'gold' => 2, 'silver' => 3, 'bronze' => 4];
+    private const TIER_ORDER = ['platinum' => 1, 'gold' => 2, 'silver' => 3, 'bronze' => 4, 'in-kind' => 5];
 
     public function __invoke(): JsonResponse
     {
         $sponsors = Sponsor::query()
-            ->orderByRaw("FIELD(tier, 'platinum', 'gold', 'silver', 'bronze')")
+            ->orderByRaw("FIELD(tier, 'platinum', 'gold', 'silver', 'bronze', 'in-kind')")
             ->orderBy('name')
             ->get()
             ->map(fn (Sponsor $sponsor) => [

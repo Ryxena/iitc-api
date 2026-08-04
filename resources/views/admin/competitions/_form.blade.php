@@ -49,6 +49,13 @@
                class="form-input" placeholder="https://drive.google.com/...">
     </div>
 
+    {{-- Group WA --}}
+    <div style="grid-column: 1 / -1;">
+        <label class="block text-sm font-medium mb-1.5" style="color: var(--text-muted)">Link Grup WhatsApp (opsional)</label>
+        <input type="url" name="group_wa" value="{{ old('group_wa', $comp?->group_wa) }}"
+               class="form-input" placeholder="https://chat.whatsapp.com/...">
+    </div>
+
     {{-- Description --}}
     <div style="grid-column: 1 / -1;">
         <label class="block text-sm font-medium mb-1.5" style="color: var(--text-muted)">Deskripsi (opsional)</label>

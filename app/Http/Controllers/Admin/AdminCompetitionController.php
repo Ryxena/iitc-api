@@ -49,6 +49,7 @@ class AdminCompetitionController extends Controller
             'price'          => ['required', 'numeric', 'min:0'],
             'description'    => ['nullable', 'string'],
             'guide_book'     => ['nullable', 'string', 'max:500'],
+            'group_wa'       => ['nullable', 'url', 'max:500'],
             'event_id'       => ['required', 'exists:events,id'],
             'categories'     => ['nullable', 'array'],
             'categories.*'   => ['exists:categories,id'],
@@ -68,6 +69,7 @@ class AdminCompetitionController extends Controller
             'price'       => $data['price'],
             'description' => $data['description'] ?? null,
             'guide_book'  => $data['guide_book'] ?? null,
+            'group_wa'    => $data['group_wa'] ?? null,
             'event_id'    => $data['event_id'],
             'cover'       => $coverUrl,
         ]);
@@ -94,6 +96,7 @@ class AdminCompetitionController extends Controller
             'price'        => ['required', 'numeric', 'min:0'],
             'description'  => ['nullable', 'string'],
             'guide_book'   => ['nullable', 'string', 'max:500'],
+            'group_wa'     => ['nullable', 'url', 'max:500'],
             'categories'   => ['nullable', 'array'],
             'categories.*' => ['exists:categories,id'],
             'cover'        => ['nullable', 'image', 'max:3072'],
@@ -107,6 +110,7 @@ class AdminCompetitionController extends Controller
             'price'       => $data['price'],
             'description' => $data['description'] ?? null,
             'guide_book'  => $data['guide_book'] ?? null,
+            'group_wa'    => $data['group_wa'] ?? null,
         ];
 
         if ($request->hasFile('cover')) {

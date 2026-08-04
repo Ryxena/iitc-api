@@ -31,14 +31,15 @@ class CompetitionController extends Controller
                 $categories = $competition->categories->map(fn (Category $cat) => ['name' => $cat->name]);
 
                 return [
-                    'slug'       => $competition->slug,
-                    'name'       => $competition->name,
-                    'description'      => $competition->description,
-                    'guideBookLink'    => $competition->guide_book,
+                    'slug'           => $competition->slug,
+                    'name'           => $competition->name,
+                    'description'    => $competition->description,
+                    'guideBookLink'  => $competition->guide_book,
+                    'groupWa'        => $competition->group_wa,
                     'competitionPrice' => $competition->price,
-                    'cover'      => $competition->cover,
-                    'maxMembers' => $competition->max_members,
-                    'categories' => $categories,
+                    'cover'          => $competition->cover,
+                    'maxMembers'     => $competition->max_members,
+                    'categories'     => $categories,
                 ];
             });
 
@@ -63,6 +64,7 @@ class CompetitionController extends Controller
             'price'       => $request->input('price'),
             'description' => $request->input('description'),
             'guide_book'  => $request->input('guideBookLink'),
+            'group_wa'    => $request->input('groupWa'),
             'cover'       => Storage::disk('public')->url($cover),
             'event_id'    => $event->id,
         ]);
@@ -100,6 +102,7 @@ class CompetitionController extends Controller
             'maxMembers'       => $result->max_members,
             'description'      => $result->description,
             'guideBookLink'    => $result->guide_book,
+            'groupWa'          => $result->group_wa,
             'competitionPrice' => $result->price,
             'techStacks'       => $techStacks,
             'categories'       => $categories,
@@ -121,6 +124,7 @@ class CompetitionController extends Controller
             'price'       => $request->input('price'),
             'description' => $request->input('description'),
             'guide_book'  => $request->input('guideBookLink'),
+            'group_wa'    => $request->input('groupWa'),
         ];
 
         if ($request->file('cover') !== null) {
