@@ -24,6 +24,9 @@
                         <x-nav-link :href="route('admin.seminars.index')" :active="request()->routeIs('admin.seminars.*')">
                             {{ __('Kelola Seminar') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('admin.winners.index')" :active="request()->routeIs('admin.winners.*')">
+                            {{ __('Daftar Juara') }}
+                        </x-nav-link>
                     @endif
                 </div>
             </div>
@@ -85,6 +88,9 @@
             @if(Auth::user()?->hasRole('Super Admin'))
                 <x-responsive-nav-link :href="route('admin.seminars.index')" :active="request()->routeIs('admin.seminars.*')">
                     {{ __('Kelola Seminar') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('admin.winners.index')" :active="request()->routeIs('admin.winners.*')">
+                    {{ __('Daftar Juara') }}
                 </x-responsive-nav-link>
             @endif
         </div>

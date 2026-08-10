@@ -38,4 +38,9 @@ class Team extends Model
     {
         return $this->hasOne(PaymentStatus::class);
     }
+
+    public function winner(): HasOne
+    {
+        return $this->hasOne(Winner::class);
+    }
 }

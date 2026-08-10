@@ -102,6 +102,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::post('/sponsors', [AdminSponsorController::class, 'store'])->name('sponsors.store');
         Route::post('/sponsors/{sponsor}', [AdminSponsorController::class, 'update'])->name('sponsors.update');
         Route::delete('/sponsors/{sponsor}', [AdminSponsorController::class, 'destroy'])->name('sponsors.destroy');
+
+        // Winners
+        Route::get('/winners', [\App\Http\Controllers\Admin\AdminWinnerController::class, 'index'])->name('winners.index');
+        Route::post('/winners', [\App\Http\Controllers\Admin\AdminWinnerController::class, 'store'])->name('winners.store');
+        Route::delete('/winners/{teamId}', [\App\Http\Controllers\Admin\AdminWinnerController::class, 'destroy'])->name('winners.destroy');
     });
 });
 

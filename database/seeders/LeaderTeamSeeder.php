@@ -109,6 +109,20 @@ class LeaderTeamSeeder extends Seeder
             ]);
         }
 
+        // ── 5. Payment Proof & Status ──────────────────────────────────────────
+        \App\Models\Payment::firstOrCreate(
+            ['team_id' => $team->id],
+            ['transfer_receipt' => 'https://via.placeholder.com/600x400.png?text=Fake+Receipt']
+        );
+
+        \App\Models\PaymentStatus::firstOrCreate(
+            ['team_id' => $team->id],
+            [
+                'status' => \App\Helpers\PaymentStatus::VALID, 
+                'reason' => 'Automatically validated by seeder'
+            ]
+        );
+
         $this->command->info('LeaderTeamSeeder done.');
         $this->command->info("  Leader  → user@gmail.com / myPassword  (team_id: {$team->id})");
         $this->command->info("  Member1 → member1@gmail.com / myPassword");

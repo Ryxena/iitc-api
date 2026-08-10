@@ -58,6 +58,9 @@ Route::get('/competitions/{slug}', [CompetitionController::class, 'show']);
 Route::get('/seminars', [PublicSeminarController::class, 'index']);
 Route::get('/seminars/{id}', [PublicSeminarController::class, 'show']);
 
+// Winners (public read)
+Route::get('/winners', [\App\Http\Controllers\PublicWinnerController::class, 'index']);
+
 // Sponsors (public read, sorted by tier)
 Route::get('/sponsors', PublicSponsorController::class);
 
@@ -107,11 +110,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/admin')->group(function () {
         Route::get('/teams', [AdminTeamController::class, 'index']);
         Route::get('/teams/{teamId}', [AdminTeamController::class, 'show']);
+        
+        // Admin — Winners
+        Route::post('/winners', [\App\Http\Controllers\Admin\WinnerController::class, 'store']);
+        Route::delete('/winners/{teamId}', [\App\Http\Controllers\Admin\WinnerController::class, 'destroy']);
     });
-    Route::get('/teams/{teamId}/admin', [AdminGetDetailTeamController::class, 'show']);
+    Route::get('/teams/{teamId}/admin', [App\Http\Controllers\AdminGetDetailTeamController::class, 'show']);
 
     // Admin — Payment
-    Route::post('/payment/{teamId}/payment-status', [PaymentStatusController::class, 'update']);
+    Route::post('/payment/{teamId}/payment-status', [App\Http\Controllers\PaymentStatusController::class, 'update']);
 
     // ----------------------------------------------------------
     // USER / PARTICIPANT ROUTES
