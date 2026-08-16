@@ -37,7 +37,7 @@
                         <th style="border-right: none;">Nama Tim / Kode</th>
                         <th style="border-right: none;">Ketua</th>
                         <th style="border-right: none;">Kompetisi</th>
-                        <th class="text-center" style="border-right: none;">Status Aktif</th>
+                        <th style="border-right: none;">Institusi</th>
                         <th style="border-right: none; text-align: right;">Aksi</th>
                     </tr>
                 </thead>
@@ -57,12 +57,8 @@
                                     {{ $team->competition->name ?? '-' }}
                                 </span>
                             </td>
-                            <td class="text-center" style="border-right: none;">
-                                @if($team->is_active)
-                                    <span class="badge badge-valid">Aktif</span>
-                                @else
-                                    <span class="badge badge-invalid">Tidak Aktif</span>
-                                @endif
+                            <td style="border-right: none;">
+                                <span class="text-sm text-main">{{ $team->leader->participant->institution ?? '-' }}</span>
                             </td>
                             <td style="border-right: none; text-align: right;">
                                 <div class="flex items-center justify-end gap-2">

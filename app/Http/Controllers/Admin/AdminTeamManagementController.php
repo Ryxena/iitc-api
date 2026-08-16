@@ -23,7 +23,7 @@ class AdminTeamManagementController extends Controller
             ? Competition::query()->where('event_id', $activeEvent->id)->orderBy('name')->get()
             : collect();
 
-        $query = Team::query()->with(['competition', 'leader'])->latest();
+        $query = Team::query()->with(['competition', 'leader.participant'])->latest();
 
         if ($search) {
             $query->where(function ($q) use ($search) {
