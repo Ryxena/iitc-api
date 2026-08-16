@@ -187,6 +187,7 @@
                 Users
             </a>
 
+
             <a href="{{ route('admin.competitions.index') }}"
                class="nav-link {{ request()->routeIs('admin.competitions.*') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">

@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\AdminMediaPartnerController;
 use App\Http\Controllers\Admin\AdminSeminarManagementController;
 use App\Http\Controllers\Admin\AdminParticipantRecapController;
 use App\Http\Controllers\Admin\AdminSponsorController;
+use App\Http\Controllers\Admin\AdminTeamManagementController;
 use App\Http\Controllers\Admin\AdminTeamRecapController;
 use App\Http\Controllers\Admin\AdminUserController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
@@ -69,6 +70,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/users/{userId}/edit', [AdminUserController::class, 'edit'])->name('users.edit');
         Route::patch('/users/{userId}', [AdminUserController::class, 'update'])->name('users.update');
         Route::delete('/users/{userId}', [AdminUserController::class, 'destroy'])->name('users.destroy');
+
+        // Teams (CRUD Management)
+        Route::get('/teams-management', [AdminTeamManagementController::class, 'index'])->name('teams-management.index');
+        Route::patch('/teams-management/{team}', [AdminTeamManagementController::class, 'update'])->name('teams-management.update');
+        Route::delete('/teams-management/{team}', [AdminTeamManagementController::class, 'destroy'])->name('teams-management.destroy');
 
         // Competitions
         Route::get('/competitions', [AdminCompetitionController::class, 'index'])->name('competitions.index');
