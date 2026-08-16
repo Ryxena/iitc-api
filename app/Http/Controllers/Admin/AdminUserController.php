@@ -73,7 +73,7 @@ class AdminUserController extends Controller
         ];
 
         if (!empty($validated['password'])) {
-            $updateData['password'] = bcrypt($validated['password']);
+            $updateData['password'] = $validated['password'];
         }
 
         $user->update($updateData);
