@@ -16,7 +16,7 @@ class AdminTeamRecapController extends Controller
 {
     public function index(Request $request): View
     {
-        $allEvents   = Event::query()->orderByDesc('created_at')->get();
+        $allEvents = Event::query()->orderByDesc('created_at')->get();
         $activeEvent = Event::query()->where('is_active', true)->first();
 
         $selectedEventId = $request->query('event_id');
@@ -31,9 +31,9 @@ class AdminTeamRecapController extends Controller
 
         $competitionIds = $competitions->pluck('id');
 
-        $status        = $request->query('status', 'ALL');
+        $status = $request->query('status', 'ALL');
         $competitionId = $request->query('competition_id', 'ALL');
-        $search        = trim($request->query('search', ''));
+        $search = trim($request->query('search', ''));
 
         // Stats calculation
         $baseTeamsQuery = Team::query()->whereIn('competition_id', $competitionIds);
@@ -54,7 +54,7 @@ class AdminTeamRecapController extends Controller
             ->whereHas('paymentStatus', fn ($q) => $q->where('status', PaymentStatusHelper::INVALID))
             ->count();
 
-        $teamIdsForEvent   = (clone $baseTeamsQuery)->pluck('id');
+        $teamIdsForEvent = (clone $baseTeamsQuery)->pluck('id');
         $totalMembersCount = Member::query()->whereIn('team_id', $teamIdsForEvent)->count();
         $totalParticipants = $totalTeamsCount + $totalMembersCount;
 
@@ -127,21 +127,21 @@ class AdminTeamRecapController extends Controller
 
     public function export(Request $request): StreamedResponse
     {
-        $exportType      = $request->query('export_type', 'teams'); // 'teams' | 'participants'
+        $exportType = $request->query('export_type', 'teams'); // 'teams' | 'participants'
         $selectedEventId = $request->query('event_id');
 
         if (! $selectedEventId) {
-            $activeEvent     = Event::query()->where('is_active', true)->first();
+            $activeEvent = Event::query()->where('is_active', true)->first();
             $selectedEventId = $activeEvent?->id;
         }
 
-        $competitions   = $selectedEventId
+        $competitions = $selectedEventId
             ? Competition::query()->where('event_id', $selectedEventId)->pluck('id')
             : Competition::query()->pluck('id');
 
-        $status        = $request->query('status', 'ALL');
+        $status = $request->query('status', 'ALL');
         $competitionId = $request->query('competition_id', 'ALL');
-        $search        = trim($request->query('search', ''));
+        $search = trim($request->query('search', ''));
 
         $query = Team::query()
             ->whereIn('competition_id', $competitions)
@@ -180,36 +180,78 @@ class AdminTeamRecapController extends Controller
             }
         }
 
-        $teams = $query->latest()->get();
+        $teams = $query->oldest()->get();
 
-        $filenameSuffix = $exportType === 'participants' ? 'peserta-lomba-roster' : 'recap-tim-lomba';
-        $headers        = [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="' . $filenameSuffix . '-' . now()->format('Y-m-d') . '.csv"',
+        $filenameSuffix = match ($exportType) {
+            'participants_only' => 'peserta-lomba-individu',
+            'participants' => 'peserta-lomba-roster',
+            default => 'recap-tim-lomba',
+        };
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="'.$filenameSuffix.'-'.now()->format('Y-m-d').'.csv"',
         ];
 
         $callback = function () use ($teams, $exportType) {
             $handle = fopen('php://output', 'w');
-            fputs($handle, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel compatibility
+            fwrite($handle, "\xEF\xBB\xBF"); // UTF-8 BOM for Excel compatibility
 
-            if ($exportType === 'participants') {
-                // Roster mode: export each individual participant (leader & member)
+            if ($exportType === 'participants_only') {
+                // Individual-only mode: export each person without team columns (original format)
                 fputcsv($handle, [
                     'No',
                     'Nama Lengkap',
+                    'Email',
                     'Nomor Telepon',
                     'Asal Sekolah',
                 ]);
 
                 $index = 1;
                 foreach ($teams as $team) {
-                    $paymentStatusStr = $team->paymentStatus->status ?? 'BELUM UPLOAD';
+                    $leader = $team->leader;
+                    fputcsv($handle, [
+                        $index++,
+                        $leader->name ?? '-',
+                        $leader->email ?? '-',
+                        $leader->phone ?? '-',
+                        $leader->participant->institution ?? '-',
+                    ]);
+
+                    foreach ($team->members as $member) {
+                        fputcsv($handle, [
+                            $index++,
+                            $member->name ?? '-',
+                            $member->email ?? '-',
+                            $member->phone ?? '-',
+                            $member->participant->institution ?? '-',
+                        ]);
+                    }
+                }
+            } elseif ($exportType === 'participants') {
+                // Roster mode: export each individual participant (leader & member), grouped by team
+                fputcsv($handle, [
+                    'No',
+                    'Nama Tim',
+                    'Tanggal Daftar Tim',
+                    'Nama Lengkap',
+                    'Peran',
+                    'Nomor Telepon',
+                    'Asal Sekolah',
+                ]);
+
+                $index = 1;
+                foreach ($teams as $team) {
+                    $teamName = $team->name ?? '-';
+                    $teamRegisteredAt = $team->created_at ? $team->created_at->format('d/m/Y H:i') : '-';
 
                     // 1. Leader
                     $leader = $team->leader;
                     fputcsv($handle, [
                         $index++,
+                        $teamName,
+                        $teamRegisteredAt,
                         $leader->name ?? '-',
+                        'Ketua Tim',
                         $leader->phone ?? '-',
                         $leader->participant->institution ?? '-',
                     ]);
@@ -218,7 +260,10 @@ class AdminTeamRecapController extends Controller
                     foreach ($team->members as $member) {
                         fputcsv($handle, [
                             $index++,
+                            $teamName,
+                            $teamRegisteredAt,
                             $member->name ?? '-',
+                            'Anggota Tim',
                             $member->phone ?? '-',
                             $member->participant->institution ?? '-',
                         ]);

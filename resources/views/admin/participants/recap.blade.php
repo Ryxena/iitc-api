@@ -49,12 +49,19 @@
 
             {{-- Right Group: Export Controls --}}
             <div class="flex gap-3 items-center">
-                <a href="{{ route('admin.teams.recap.export', ['export_type' => 'participants']) }}"
+                <a href="{{ route('admin.teams.recap.export', ['export_type' => 'participants_only']) }}"
                    class="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium bg-white text-gray-900 border-gray-300 hover:bg-gray-50 shadow-sm transition-colors" title="Export CSV Data Individu">
                     <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
                     </svg>
                     Export Data Individu
+                </a>
+                <a href="{{ route('admin.teams.recap.export', ['export_type' => 'participants']) }}"
+                   class="flex items-center gap-2 px-4 py-2 rounded-lg border text-sm font-medium bg-white text-gray-900 border-gray-300 hover:bg-gray-50 shadow-sm transition-colors" title="Export CSV Individu & Team">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                    </svg>
+                    Export Individu & Team
                 </a>
             </div>
         </form>
