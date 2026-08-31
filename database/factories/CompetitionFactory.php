@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Competition;
+use App\Models\Event;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -25,7 +26,7 @@ class CompetitionFactory extends Factory
             'description' => fake()->text(250),
             'guide_book' => fake()->imageUrl,
             'cover' => fake()->imageUrl,
-            'event_id' => \App\Models\Event::factory(),
+            'event_id' => Event::factory(),
         ];
     }
 }

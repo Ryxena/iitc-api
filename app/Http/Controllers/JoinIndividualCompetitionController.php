@@ -38,7 +38,7 @@ class JoinIndividualCompetitionController extends Controller
             }
 
             $team = Team::query()->create([
-                'leader_id'      => $userId,
+                'leader_id' => $userId,
                 'competition_id' => $competition->id,
             ]);
 

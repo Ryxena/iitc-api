@@ -36,9 +36,9 @@ class DeleteTeamMemberController extends Controller
             $user->asMembers()->detach($team->id);
 
             return $this->success('Succeed left the team', [
-                'teamId'     => $team->id,
+                'teamId' => $team->id,
                 'memberName' => $user->name,
-                'memberId'   => $user->id,
+                'memberId' => $user->id,
             ]);
         }
 
@@ -54,9 +54,9 @@ class DeleteTeamMemberController extends Controller
         $member->asMembers()->detach($team->id);
 
         return $this->success('Succeed delete user from team', [
-            'teamId'     => $team->id,
+            'teamId' => $team->id,
             'memberName' => $member->name,
-            'memberId'   => $memberId,
+            'memberId' => $memberId,
         ]);
     }
 }

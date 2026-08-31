@@ -40,8 +40,8 @@ it('can login a user', function () {
     $response->assertSuccessful()
         ->assertJsonStructure([
             'data' => [
-                'access_token'
-            ]
+                'access_token',
+            ],
         ]);
 });
 

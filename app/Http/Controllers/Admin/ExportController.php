@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Competition;
 use App\Models\Event;
-use App\Models\Member;
 use App\Models\SeminarRegistration;
 use App\Models\Team;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -28,15 +27,15 @@ class ExportController extends Controller
             ->get();
 
         $headers = [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="pendaftar-lomba-' . now()->format('Y-m-d') . '.csv"',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="pendaftar-lomba-'.now()->format('Y-m-d').'.csv"',
         ];
 
         $callback = function () use ($teams) {
             $handle = fopen('php://output', 'w');
 
             // BOM for Excel UTF-8
-            fputs($handle, "\xEF\xBB\xBF");
+            fwrite($handle, "\xEF\xBB\xBF");
 
             // Header row
             fputcsv($handle, [
@@ -83,15 +82,15 @@ class ExportController extends Controller
             ->get();
 
         $headers = [
-            'Content-Type'        => 'text/csv; charset=UTF-8',
-            'Content-Disposition' => 'attachment; filename="peserta-seminar-' . now()->format('Y-m-d') . '.csv"',
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => 'attachment; filename="peserta-seminar-'.now()->format('Y-m-d').'.csv"',
         ];
 
         $callback = function () use ($registrations) {
             $handle = fopen('php://output', 'w');
 
             // BOM for Excel UTF-8
-            fputs($handle, "\xEF\xBB\xBF");
+            fwrite($handle, "\xEF\xBB\xBF");
 
             fputcsv($handle, ['No', 'Nama', 'TTD']);
 

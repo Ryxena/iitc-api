@@ -38,7 +38,7 @@ it('can update an event if authorized', function () {
     $user->assignRole('User');
     $event = Event::factory()->create();
 
-    $response = $this->actingAs($user)->putJson('/api/events/' . $event->id, [
+    $response = $this->actingAs($user)->putJson('/api/events/'.$event->id, [
         'name' => 'Updated Event',
         'description' => 'Updated Description',
     ]);
@@ -51,7 +51,7 @@ it('can delete an event if authorized', function () {
     $user->assignRole('User');
     $event = Event::factory()->create();
 
-    $response = $this->actingAs($user)->deleteJson('/api/events/' . $event->id);
+    $response = $this->actingAs($user)->deleteJson('/api/events/'.$event->id);
 
     expect($response->status())->toBeIn([200, 403]);
 });
@@ -61,7 +61,7 @@ it('can change event active status if authorized', function () {
     $user->assignRole('User');
     $event = Event::factory()->create(['is_active' => false]);
 
-    $response = $this->actingAs($user)->putJson('/api/events/' . $event->id . '/set-active');
+    $response = $this->actingAs($user)->putJson('/api/events/'.$event->id.'/set-active');
 
     expect($response->status())->toBeIn([200, 403]);
 });

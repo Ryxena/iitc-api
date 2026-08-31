@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Participant;
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -18,14 +17,14 @@ class AdminParticipantRecapController extends Controller
             ->with([
                 'user',
                 'user.teams.competition',
-                'user.asMembers.competition'
+                'user.asMembers.competition',
             ]);
 
         if ($search !== '') {
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             })->orWhere('institution', 'like', "%{$search}%");
         }
 

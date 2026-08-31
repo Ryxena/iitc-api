@@ -30,10 +30,10 @@ class IncrementalRateLimit
      * Penalty durations in seconds indexed by violation count (0-based).
      */
     private const PENALTIES = [
-        0 =>    60,   // 1 minute
-        1 =>   300,   // 5 minutes
-        2 =>   900,   // 15 minutes
-        3 =>  3600,   // 60 minutes
+        0 => 60,   // 1 minute
+        1 => 300,   // 5 minutes
+        2 => 900,   // 15 minutes
+        3 => 3600,   // 60 minutes
         4 => 86400,   // 24 hours
     ];
 
@@ -42,7 +42,7 @@ class IncrementalRateLimit
      * Override per action via constructor parameter.
      */
     private const LIMITS = [
-        'login'    => 5,
+        'login' => 5,
         'register' => 3,
     ];
 
@@ -53,8 +53,8 @@ class IncrementalRateLimit
      */
     public function handle(Request $request, Closure $next, string $action = 'login'): Response
     {
-        $ip        = $request->ip();
-        $blockKey  = "irl:{$action}:blocked:{$ip}";
+        $ip = $request->ip();
+        $blockKey = "irl:{$action}:blocked:{$ip}";
         $attemptsKey = "irl:{$action}:attempts:{$ip}";
         $violationsKey = "irl:{$action}:violations:{$ip}";
 
@@ -62,12 +62,13 @@ class IncrementalRateLimit
         $blockedUntil = Cache::get($blockKey);
         if ($blockedUntil !== null) {
             $remainingSeconds = max(0, $blockedUntil - now()->timestamp);
+
             return $this->blockedResponse($remainingSeconds);
         }
 
         // ── 2. Increment attempt counter (1-minute sliding window) ─────────
         $maxAttempts = self::LIMITS[$action] ?? 5;
-        $windowKey   = "irl:{$action}:window_start:{$ip}";
+        $windowKey = "irl:{$action}:window_start:{$ip}";
 
         $windowStart = Cache::get($windowKey);
         if ($windowStart === null) {
@@ -76,16 +77,16 @@ class IncrementalRateLimit
             Cache::put($attemptsKey, 1, 60);
             $attempts = 1;
         } else {
-            $elapsed       = now()->timestamp - $windowStart;
+            $elapsed = now()->timestamp - $windowStart;
             $remainingInWindow = max(1, 60 - $elapsed);
-            $attempts      = Cache::get($attemptsKey, 0) + 1;
+            $attempts = Cache::get($attemptsKey, 0) + 1;
             Cache::put($attemptsKey, $attempts, $remainingInWindow);
         }
 
         // ── 3. If attempts exceeded, record violation and block ────────────
         if ($attempts > $maxAttempts) {
-            $violations     = Cache::get($violationsKey, 0);
-            $penaltyIndex   = min($violations, count(self::PENALTIES) - 1);
+            $violations = Cache::get($violationsKey, 0);
+            $penaltyIndex = min($violations, count(self::PENALTIES) - 1);
             $penaltySeconds = self::PENALTIES[$penaltyIndex];
 
             // Increment violations (persist 24h so repeated offenders escalate)
@@ -111,13 +112,13 @@ class IncrementalRateLimit
     private function blockedResponse(int $remainingSeconds): Response
     {
         $minutes = (int) ceil($remainingSeconds / 60);
-        $label   = $minutes <= 1
+        $label = $minutes <= 1
             ? '1 menit'
             : "{$minutes} menit";
 
         return response()->json([
-            'success'     => false,
-            'message'     => "Terlalu banyak percobaan, harap coba lagi dalam {$label}",
+            'success' => false,
+            'message' => "Terlalu banyak percobaan, harap coba lagi dalam {$label}",
             'retry_after' => $remainingSeconds,
         ], 429);
     }

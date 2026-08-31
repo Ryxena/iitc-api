@@ -166,11 +166,10 @@ GET /api/teams/{teamId}
 
 #### Update Tim
 ```
-POST /api/teams/{teamId}/update
+POST /api/teams/mine/update
 ```
-- Input: `name`, `title`, `submission` (link karya)
+- Input: `name`, `title`
 - File: `avatar`
-- Field `submission` diisi saat submit karya
 
 #### Hapus Tim
 ```
@@ -194,10 +193,10 @@ POST /api/payment/{teamId}
 ### 4.6 Submit Karya
 
 ```
-POST /api/teams/{teamId}/update
+POST /api/teams/mine/submission
 ```
 - Input: `submission` (URL link karya)
-- Sama dengan endpoint update tim, field `submission` diisi saat sudah siap
+- Hanya leader tim yang dapat melakukan submit karya
 
 ---
 
@@ -254,10 +253,7 @@ GET /api/seminar/{userId}/certificate
 ```
 [PUBLIC — tanpa login]
   POST   /api/register
-  GET    /api/verify-email/{id}/{hash}
   POST   /api/login
-  POST   /api/forgot-password
-  POST   /api/reset-password
   GET    /api/competitions
   GET    /api/competitions/categories
   GET    /api/competitions/{slug}
@@ -272,8 +268,7 @@ GET /api/seminar/{userId}/certificate
 
   ─ Competitions ─────────────────────────────────────────────────
   GET    /api/competitions/mine              ← lihat kompetisi saya
-  POST   /api/individual/{competitionSlug}  ← daftar individu
-
+  
   ─ Teams ────────────────────────────────────────────────────────
   POST   /api/teams/{competitionSlug}                  ← buat tim
   PUT    /api/teams/join                                ← join tim via kode

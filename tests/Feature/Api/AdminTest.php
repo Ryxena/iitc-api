@@ -25,7 +25,7 @@ it('can get specific team as admin from admin path', function () {
     $admin->assignRole('User');
     $team = Team::factory()->create();
 
-    $response = $this->actingAs($admin)->getJson('/api/admin/teams/' . $team->id);
+    $response = $this->actingAs($admin)->getJson('/api/admin/teams/'.$team->id);
 
     expect($response->status())->toBeIn([200, 403, 404]);
 });
@@ -35,7 +35,7 @@ it('can get specific team admin details', function () {
     $admin->assignRole('User');
     $team = Team::factory()->create();
 
-    $response = $this->actingAs($admin)->getJson('/api/teams/' . $team->id . '/admin');
+    $response = $this->actingAs($admin)->getJson('/api/teams/'.$team->id.'/admin');
 
     expect($response->status())->toBeIn([200, 403, 404]);
 });

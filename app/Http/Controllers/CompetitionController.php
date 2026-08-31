@@ -31,15 +31,15 @@ class CompetitionController extends Controller
                 $categories = $competition->categories->map(fn (Category $cat) => ['name' => $cat->name]);
 
                 return [
-                    'slug'           => $competition->slug,
-                    'name'           => $competition->name,
-                    'description'    => $competition->description,
-                    'guideBookLink'  => $competition->guide_book,
-                    'groupWa'        => $competition->group_wa,
+                    'slug' => $competition->slug,
+                    'name' => $competition->name,
+                    'description' => $competition->description,
+                    'guideBookLink' => $competition->guide_book,
+                    'groupWa' => $competition->group_wa,
                     'competitionPrice' => $competition->price,
-                    'cover'          => $competition->cover,
-                    'maxMembers'     => $competition->max_members,
-                    'categories'     => $categories,
+                    'cover' => $competition->cover,
+                    'maxMembers' => $competition->max_members,
+                    'categories' => $categories,
                 ];
             });
 
@@ -58,20 +58,20 @@ class CompetitionController extends Controller
         $cover = $request->file('cover')->store('competition/avatar', ['disk' => 'public']);
 
         $competition = Competition::query()->create([
-            'name'        => $request->input('name'),
-            'deadline'    => $request->input('deadline'),
+            'name' => $request->input('name'),
+            'deadline' => $request->input('deadline'),
             'max_members' => $request->input('maxMembers'),
-            'price'       => $request->input('price'),
+            'price' => $request->input('price'),
             'description' => $request->input('description'),
-            'guide_book'  => $request->input('guideBookLink'),
-            'group_wa'    => $request->input('groupWa'),
-            'cover'       => Storage::disk('public')->url($cover),
-            'event_id'    => $event->id,
+            'guide_book' => $request->input('guideBookLink'),
+            'group_wa' => $request->input('groupWa'),
+            'cover' => Storage::disk('public')->url($cover),
+            'event_id' => $event->id,
         ]);
 
-        $criteriaData    = $this->getCriteriaToDatabase(json_decode($request->criteria), $competition->id);
-        $techStacksData  = $this->getTechStacksToDatabase(json_decode($request->techStacks), $competition->id);
-        $categoriesData  = $this->getCategoriesToDatabase($request->categories, $competition->id);
+        $criteriaData = $this->getCriteriaToDatabase(json_decode($request->criteria), $competition->id);
+        $techStacksData = $this->getTechStacksToDatabase(json_decode($request->techStacks), $competition->id);
+        $categoriesData = $this->getCategoriesToDatabase($request->categories, $competition->id);
 
         Criterion::query()->insert($criteriaData);
         TechStack::query()->insert($techStacksData);
@@ -88,25 +88,25 @@ class CompetitionController extends Controller
             'categories:id,name',
         ])->where('slug', $slug)->firstOrFail();
 
-        $deadline   = Carbon::parse($result->deadline);
+        $deadline = Carbon::parse($result->deadline);
         $techStacks = $result->techStacks->map(fn ($item) => $item->name);
         $categories = $result->categories->map(fn ($item) => ['name' => $item->name]);
-        $criteria   = $result->criteria->map(fn ($item) => ['name' => $item->name, 'percentage' => $item->percentage]);
+        $criteria = $result->criteria->map(fn ($item) => ['name' => $item->name, 'percentage' => $item->percentage]);
 
         $competition = [
-            'name'             => $result->name,
-            'slug'             => $result->slug,
-            'cover'            => $result->cover,
-            'deadline'         => (int) $deadline->diffInDays(Carbon::now()),
-            'deadlineDate'     => $deadline->format('Y-m-d'),
-            'maxMembers'       => $result->max_members,
-            'description'      => $result->description,
-            'guideBookLink'    => $result->guide_book,
-            'groupWa'          => $result->group_wa,
+            'name' => $result->name,
+            'slug' => $result->slug,
+            'cover' => $result->cover,
+            'deadline' => (int) $deadline->diffInDays(Carbon::now()),
+            'deadlineDate' => $deadline->format('Y-m-d'),
+            'maxMembers' => $result->max_members,
+            'description' => $result->description,
+            'guideBookLink' => $result->guide_book,
+            'groupWa' => $result->group_wa,
             'competitionPrice' => $result->price,
-            'techStacks'       => $techStacks,
-            'categories'       => $categories,
-            'criteria'         => $criteria,
+            'techStacks' => $techStacks,
+            'categories' => $categories,
+            'criteria' => $criteria,
         ];
 
         return $this->success('Succeed get detail competition.', ['competition' => $competition]);
@@ -118,13 +118,13 @@ class CompetitionController extends Controller
         $this->authorize('update', $competition);
 
         $competitionData = [
-            'name'        => $request->input('name'),
-            'deadline'    => $request->input('deadline'),
+            'name' => $request->input('name'),
+            'deadline' => $request->input('deadline'),
             'max_members' => $request->input('maxMembers'),
-            'price'       => $request->input('price'),
+            'price' => $request->input('price'),
             'description' => $request->input('description'),
-            'guide_book'  => $request->input('guideBookLink'),
-            'group_wa'    => $request->input('groupWa'),
+            'guide_book' => $request->input('guideBookLink'),
+            'group_wa' => $request->input('groupWa'),
         ];
 
         if ($request->file('cover') !== null) {
@@ -138,7 +138,7 @@ class CompetitionController extends Controller
         Criterion::query()->where('competition_id', $competition->id)->delete();
         TechStack::query()->where('competition_id', $competition->id)->delete();
 
-        $criteriaData   = $this->getCriteriaToDatabase(json_decode($request->criteria), $competition->id);
+        $criteriaData = $this->getCriteriaToDatabase(json_decode($request->criteria), $competition->id);
         $techStacksData = $this->getTechStacksToDatabase(json_decode($request->techStacks), $competition->id);
         $categoriesData = $this->getCategoriesToDatabase($request->categories, $competition->id);
 
@@ -146,7 +146,7 @@ class CompetitionController extends Controller
         TechStack::query()->insert($techStacksData);
         $competition->categories()->sync($categoriesData);
 
-        $competition['criteria']   = $criteriaData;
+        $competition['criteria'] = $criteriaData;
         $competition['techStacks'] = $techStacksData;
 
         return $this->success('Succeed update competition.', ['competition' => $competition]);

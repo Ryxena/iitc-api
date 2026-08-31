@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Member;
-use App\Models\Team;
 use Illuminate\Http\JsonResponse;
 
 class LeaveTeamController extends Controller

@@ -14,7 +14,7 @@ class AdminUserController extends Controller
 {
     public function index(Request $request): View
     {
-        $search        = $request->query('search', '');
+        $search = $request->query('search', '');
         $competitionId = $request->query('competition', '');
 
         $activeEvent = Event::query()->where('is_active', true)->first();
@@ -31,14 +31,13 @@ class AdminUserController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%");
+                    ->orWhere('email', 'like', "%{$search}%")
+                    ->orWhere('phone', 'like', "%{$search}%");
             });
         }
 
         if ($competitionId) {
-            $query->whereHas('members.team', fn ($q) =>
-                $q->where('competition_id', $competitionId)
+            $query->whereHas('members.team', fn ($q) => $q->where('competition_id', $competitionId)
             );
         }
 
@@ -50,6 +49,7 @@ class AdminUserController extends Controller
     public function edit(string $userId): View
     {
         $user = User::with('participant')->findOrFail($userId);
+
         return view('admin.users.edit', compact('user'));
     }
 
@@ -58,21 +58,21 @@ class AdminUserController extends Controller
         $user = User::findOrFail($userId);
 
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|max:255|unique:users,email,' . $user->id,
-            'phone'       => 'nullable|string|max:20',
-            'password'    => 'nullable|string|min:8',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,'.$user->id,
+            'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|string|min:8',
             'institution' => 'nullable|string|max:255',
-            'grade'       => 'nullable|string|max:50',
+            'grade' => 'nullable|string|max:50',
         ]);
 
         $updateData = [
-            'name'  => $validated['name'],
+            'name' => $validated['name'],
             'email' => $validated['email'],
             'phone' => $validated['phone'],
         ];
 
-        if (!empty($validated['password'])) {
+        if (! empty($validated['password'])) {
             $updateData['password'] = $validated['password'];
         }
 
@@ -81,7 +81,7 @@ class AdminUserController extends Controller
         if ($user->participant) {
             $user->participant->update([
                 'institution' => $validated['institution'],
-                'grade'       => $validated['grade'],
+                'grade' => $validated['grade'],
             ]);
         }
 

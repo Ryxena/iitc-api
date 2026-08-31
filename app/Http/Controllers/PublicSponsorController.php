@@ -16,10 +16,10 @@ class PublicSponsorController extends Controller
             ->orderBy('name')
             ->get()
             ->map(fn (Sponsor $sponsor) => [
-                'id'        => $sponsor->id,
-                'name'      => $sponsor->name,
-                'tier'      => $sponsor->tier,
-                'image'     => $sponsor->image,
+                'id' => $sponsor->id,
+                'name' => $sponsor->name,
+                'tier' => $sponsor->tier,
+                'image' => $sponsor->image,
                 'createdAt' => $sponsor->created_at->toIso8601String(),
             ]);
 

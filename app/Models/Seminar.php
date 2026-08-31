@@ -12,9 +12,9 @@ class Seminar extends Model
     protected $guarded = [];
 
     protected $casts = [
-        'date_time'  => 'datetime',
+        'date_time' => 'datetime',
         'start_date' => 'date',
-        'end_date'   => 'date',
-        'is_active'  => 'boolean',
+        'end_date' => 'date',
+        'is_active' => 'boolean',
     ];
 }

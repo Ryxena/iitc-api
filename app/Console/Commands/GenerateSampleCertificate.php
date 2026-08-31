@@ -8,6 +8,7 @@ use Illuminate\Console\Command;
 class GenerateSampleCertificate extends Command
 {
     protected $signature = 'cert:sample {name=Budi Santoso}';
+
     protected $description = 'Generate a sample certificate for preview';
 
     public function handle(CertificateService $certificateService): void

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Winner;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -20,7 +21,7 @@ class WinnerController extends Controller
             'award_title' => 'required|string',
         ]);
 
-        $winner = \App\Models\Winner::updateOrCreate(
+        $winner = Winner::updateOrCreate(
             ['team_id' => $request->team_id],
             ['rank' => $request->rank, 'award_title' => $request->award_title]
         );
@@ -34,7 +35,7 @@ class WinnerController extends Controller
             throw new AccessDeniedHttpException('unauthorize');
         }
 
-        \App\Models\Winner::where('team_id', $teamId)->delete();
+        Winner::where('team_id', $teamId)->delete();
 
         return $this->success('Berhasil menghapus data juara', null);
     }

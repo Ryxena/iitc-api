@@ -30,7 +30,7 @@ it('can get all participants', function () {
     $user->assignRole('User');
 
     $response = $this->actingAs($user)->getJson('/api/users/participants');
-    
+
     $response->assertStatus(403);
 });
 
@@ -56,7 +56,7 @@ it('can update current user profile', function () {
     ]);
 
     $response->assertSuccessful();
-    
+
     $this->assertDatabaseHas('participants', [
         'user_id' => $user->id,
         'institution' => 'University A',

@@ -21,8 +21,8 @@ class LoginController extends Controller
             $token = $user->createToken('authToken')->plainTextToken;
 
             return $this->success('berhasil login', [
-                'access_token'       => $token,
-                'email_verified_at'  => $user->email_verified_at,
+                'access_token' => $token,
+                'email_verified_at' => $user->email_verified_at,
             ]);
         } catch (ModelNotFoundException $exception) {
             return $this->error('User tidak ditemukan', 404);

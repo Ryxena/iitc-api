@@ -1,0 +1,8 @@
+/node_modules
+/dist
+/vendor
+/.agents
+*.generated.py
+flow.md 
+routeid.md
+/tests

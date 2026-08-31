@@ -21,7 +21,7 @@ it('can store payment for team', function () {
     Storage::fake('public');
     $file = UploadedFile::fake()->image('payment.jpg');
 
-    $response = $this->actingAs($user)->postJson('/api/payment/' . $team->id, [
+    $response = $this->actingAs($user)->postJson('/api/payment/'.$team->id, [
         'amount' => 50000,
         'proveOfPayment' => $file,
     ]);
@@ -43,7 +43,7 @@ it('can update payment status for team', function () {
     $admin->assignRole('User'); // Actually Admin
     $team = Team::factory()->create();
 
-    $response = $this->actingAs($admin)->postJson('/api/payment/' . $team->id . '/payment-status', [
+    $response = $this->actingAs($admin)->postJson('/api/payment/'.$team->id.'/payment-status', [
         'isApprove' => true,
         'reason' => 'Approved',
     ]);

@@ -21,8 +21,8 @@ class AdminSeminarManagementController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('speaker', 'like', "%{$search}%")
-                  ->orWhere('location', 'like', "%{$search}%");
+                    ->orWhere('speaker', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%");
             });
         }
 
@@ -34,7 +34,7 @@ class AdminSeminarManagementController extends Controller
 
         $seminars = $query->paginate(15)->withQueryString();
 
-        $totalCount  = Seminar::count();
+        $totalCount = Seminar::count();
         $activeCount = Seminar::where('is_active', true)->count();
 
         return view('admin.seminars.index', compact(
@@ -49,16 +49,16 @@ class AdminSeminarManagementController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'title'             => ['required', 'string', 'max:255'],
-            'description'       => ['nullable', 'string'],
-            'speaker'           => ['nullable', 'string', 'max:255'],
-            'date_time'         => ['nullable', 'date'],
-            'start_date'        => ['nullable', 'date'],
-            'end_date'          => ['nullable', 'date'],
-            'location'          => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'speaker' => ['nullable', 'string', 'max:255'],
+            'date_time' => ['nullable', 'date'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date'],
+            'location' => ['nullable', 'string', 'max:255'],
             'registration_link' => ['nullable', 'url', 'max:255'],
-            'poster'            => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
-            'is_active'         => ['nullable'],
+            'poster' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
+            'is_active' => ['nullable'],
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', true);
@@ -75,16 +75,16 @@ class AdminSeminarManagementController extends Controller
     public function update(Request $request, Seminar $seminar): RedirectResponse
     {
         $validated = $request->validate([
-            'title'             => ['required', 'string', 'max:255'],
-            'description'       => ['nullable', 'string'],
-            'speaker'           => ['nullable', 'string', 'max:255'],
-            'date_time'         => ['nullable', 'date'],
-            'start_date'        => ['nullable', 'date'],
-            'end_date'          => ['nullable', 'date'],
-            'location'          => ['nullable', 'string', 'max:255'],
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'speaker' => ['nullable', 'string', 'max:255'],
+            'date_time' => ['nullable', 'date'],
+            'start_date' => ['nullable', 'date'],
+            'end_date' => ['nullable', 'date'],
+            'location' => ['nullable', 'string', 'max:255'],
             'registration_link' => ['nullable', 'url', 'max:255'],
-            'poster'            => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
-            'is_active'         => ['nullable'],
+            'poster' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
+            'is_active' => ['nullable'],
         ]);
 
         $validated['is_active'] = $request->boolean('is_active', false);
@@ -109,11 +109,11 @@ class AdminSeminarManagementController extends Controller
     public function destroy(Seminar $seminar): RedirectResponse
     {
         $title = $seminar->title;
-        
+
         if ($seminar->poster) {
             Storage::disk('public')->delete($seminar->poster);
         }
-        
+
         $seminar->delete();
 
         return redirect()->back()->with('success', "Seminar \"{$title}\" berhasil dihapus.");

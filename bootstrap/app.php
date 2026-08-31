@@ -1,6 +1,8 @@
 <?php
 
-use App\Http\Controllers\Concerns\ApiResponse as ApiResponseTrait;
+use App\Http\Middleware\EnsureIsAdmin;
+use App\Http\Middleware\EnsureIsSuperAdmin;
+use App\Http\Middleware\IncrementalRateLimit;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -35,9 +37,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         // Admin role middleware alias
         $middleware->alias([
-            'admin'            => \App\Http\Middleware\EnsureIsAdmin::class,
-            'super-admin'      => \App\Http\Middleware\EnsureIsSuperAdmin::class,
-            'incremental-rate' => \App\Http\Middleware\IncrementalRateLimit::class,
+            'admin' => EnsureIsAdmin::class,
+            'super-admin' => EnsureIsSuperAdmin::class,
+            'incremental-rate' => IncrementalRateLimit::class,
         ]);
 
         // Redirect unauthenticated web requests to the web login page
@@ -61,6 +63,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->render(function (ModelNotFoundException $e, Request $request) {
             if ($request->is('api/*')) {
                 $model = class_basename($e->getModel());
+
                 return response()->json(['success' => false, 'message' => "{$model} not found."], 404);
             }
         });
@@ -70,11 +73,10 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'success' => false,
                     'message' => 'The given data was invalid.',
-                    'errors'  => $e->errors(),
+                    'errors' => $e->errors(),
                 ], 422);
             }
         });
-
 
         $exceptions->render(function (HttpException $e, Request $request) {
             if ($request->is('api/*')) {

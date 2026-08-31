@@ -65,9 +65,9 @@ class CertificateService
         $certificateNumber = $this->generateCertificateNumber();
 
         $pdf = Pdf::loadView('certificates.seminar_certificate', [
-            'participantName'   => $participantName,
+            'participantName' => $participantName,
             'certificateNumber' => $certificateNumber,
-            'templatePath'      => $this->getTemplatePath(),
+            'templatePath' => $this->getTemplatePath(),
         ])->setPaper('A4', 'landscape');
 
         $relativePath = "certificates/{$userId}.pdf";
@@ -78,8 +78,8 @@ class CertificateService
 
         return [
             'certificate_number' => $certificateNumber,
-            'certificate_path'   => $relativePath,
-            'url'                => $url,
+            'certificate_path' => $relativePath,
+            'url' => $url,
         ];
     }
 }

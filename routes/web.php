@@ -2,18 +2,18 @@
 
 use App\Http\Controllers\Admin\AdminCompetitionController;
 use App\Http\Controllers\Admin\AdminMediaPartnerController;
-use App\Http\Controllers\Admin\AdminSeminarManagementController;
 use App\Http\Controllers\Admin\AdminParticipantRecapController;
+use App\Http\Controllers\Admin\AdminSeminarManagementController;
 use App\Http\Controllers\Admin\AdminSponsorController;
 use App\Http\Controllers\Admin\AdminTeamManagementController;
 use App\Http\Controllers\Admin\AdminTeamRecapController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminWinnerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportController as AdminExportController;
 use App\Http\Controllers\Admin\PaymentAdminController;
 use App\Http\Controllers\Admin\SeminarAdminController;
 use Illuminate\Support\Facades\Route;
-
 
 /*
 |--------------------------------------------------------------------------
@@ -36,9 +36,6 @@ Route::get('/dashboard', function () {
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-
-
-
 // ============================================================
 // ADMIN WEB ROUTES
 // ============================================================
@@ -54,7 +51,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/teams-recap', [AdminTeamRecapController::class, 'index'])->name('teams.recap');
     Route::get('/teams-recap/export', [AdminTeamRecapController::class, 'export'])->name('teams.recap.export');
     Route::get('/teams-recap/{id}', [AdminTeamRecapController::class, 'show'])->name('teams.recap.show');
-    
+
     // Individual Recap
     Route::get('/participants-recap', [AdminParticipantRecapController::class, 'index'])->name('participants.recap');
     Route::get('/participants-recap/{id}', [AdminParticipantRecapController::class, 'show'])->name('participants.recap.show');
@@ -75,6 +72,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/teams-management', [AdminTeamManagementController::class, 'index'])->name('teams-management.index');
         Route::patch('/teams-management/{team}', [AdminTeamManagementController::class, 'update'])->name('teams-management.update');
         Route::delete('/teams-management/{team}', [AdminTeamManagementController::class, 'destroy'])->name('teams-management.destroy');
+        Route::post('/teams-management/{team}/avatar', [AdminTeamManagementController::class, 'uploadAvatar'])->name('teams-management.avatar');
 
         // Competitions
         Route::get('/competitions', [AdminCompetitionController::class, 'index'])->name('competitions.index');
@@ -94,6 +92,11 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::post('/seminar/{userId}/verify', [SeminarAdminController::class, 'verify'])->name('seminar.verify');
         Route::post('/seminar/bulk-verify', [SeminarAdminController::class, 'bulkVerify'])->name('seminar.bulk-verify');
 
+        // Seminar certificate management
+        Route::get('/seminar/certificates', [SeminarAdminController::class, 'certificates'])->name('seminar.certificates');
+        Route::put('/seminar/certificates/update-label', [SeminarAdminController::class, 'updateCertificateLabel'])->name('seminar.certificates.update-label');
+        Route::post('/seminar/certificates/upload', [SeminarAdminController::class, 'uploadCertificateWeb'])->name('seminar.certificates.upload');
+
         // Export seminars
         Route::get('/export/seminars', [AdminExportController::class, 'seminars'])->name('export.seminars');
 
@@ -110,10 +113,10 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::delete('/sponsors/{sponsor}', [AdminSponsorController::class, 'destroy'])->name('sponsors.destroy');
 
         // Winners
-        Route::get('/winners', [\App\Http\Controllers\Admin\AdminWinnerController::class, 'index'])->name('winners.index');
-        Route::post('/winners', [\App\Http\Controllers\Admin\AdminWinnerController::class, 'store'])->name('winners.store');
-        Route::delete('/winners/{teamId}', [\App\Http\Controllers\Admin\AdminWinnerController::class, 'destroy'])->name('winners.destroy');
+        Route::get('/winners', [AdminWinnerController::class, 'index'])->name('winners.index');
+        Route::post('/winners', [AdminWinnerController::class, 'store'])->name('winners.store');
+        Route::delete('/winners/{teamId}', [AdminWinnerController::class, 'destroy'])->name('winners.destroy');
     });
 });
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

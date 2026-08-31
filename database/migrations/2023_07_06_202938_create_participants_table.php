@@ -1,5 +1,6 @@
 <?php
 
+use App\Helpers\Grade;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -13,7 +14,7 @@ return new class extends Migration
     {
         Schema::create('participants', function (Blueprint $table) {
             $table->uuid('user_id')->unique()->index();
-            $table->string('grade')->default(\App\Helpers\Grade::STUDENT);
+            $table->string('grade')->default(Grade::STUDENT);
             $table->string('gender');
             $table->string('student_id_number');
             $table->string('institution');

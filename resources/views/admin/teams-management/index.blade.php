@@ -45,8 +45,22 @@
                     @foreach($teams as $team)
                         <tr>
                             <td style="border-right: none;">
-                                <p class="font-semibold text-main text-sm">{{ $team->name ?? '-' }}</p>
-                                <p class="text-xs text-muted mt-0.5">{{ $team->code ?? 'Tanpa Kode' }}</p>
+                                <div class="flex items-center gap-3">
+                                    @if($team->avatar)
+                                        <img src="{{ $team->avatar }}" alt="{{ $team->name }}"
+                                             class="w-10 h-10 rounded-lg object-cover flex-shrink-0"
+                                             style="border: 1px solid var(--border);">
+                                    @else
+                                        <div class="w-10 h-10 rounded-lg flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                                             style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                                            {{ strtoupper(substr($team->name ?? 'T', 0, 1)) }}
+                                        </div>
+                                    @endif
+                                    <div>
+                                        <p class="font-semibold text-main text-sm">{{ $team->name ?? '-' }}</p>
+                                        <p class="text-xs text-muted mt-0.5">{{ $team->code ?? 'Tanpa Kode' }}</p>
+                                    </div>
+                                </div>
                             </td>
                             <td style="border-right: none;">
                                 <p class="font-semibold text-main text-sm">{{ $team->leader->name ?? '-' }}</p>
@@ -62,6 +76,9 @@
                             </td>
                             <td style="border-right: none; text-align: right;">
                                 <div class="flex items-center justify-end gap-2">
+                                    <button type="button" onclick="openAvatarModal('{{ $team->id }}', '{{ addslashes($team->name) }}')" class="btn-ghost" style="padding: 5px 12px; font-size: 12px;">
+                                            Avatar
+                                        </button>
                                     <button type="button" class="btn-ghost" style="padding: 5px 12px; font-size: 12px;"
                                             onclick="openEditModal({{ json_encode([
                                                 'id'             => $team->id,
@@ -115,11 +132,43 @@
         </div>
     </div>
 
+
+    {{-- MODAL: AVATAR --}}
+    <div id="modal-avatar" class="modal-backdrop" style="display:none; position:fixed; inset:0; z-index:50; background:rgba(0,0,0,.55); backdrop-filter:blur(4px); overflow-y:auto;">
+        <div class="modal-panel" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; max-width: 480px; margin: 60px auto; padding: 32px;">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="font-bold text-white text-lg">Upload Avatar Tim</h2>
+                <button type="button" onclick="closeModal('modal-avatar')" style="color: var(--text-muted); background:none; border:none; cursor:pointer; font-size:20px;">\u2715</button>
+            </div>
+
+            <form id="form-avatar" method="POST" enctype="multipart/form-data" action="">
+                @csrf
+                <p class="text-sm text-muted mb-4">Upload untuk: <strong id="avatar-team-name" class="text-white"></strong></p>
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-white mb-1">File Avatar</label>
+                    <input type="file" name="avatar" accept=".jpg,.jpeg,.png" required class="form-input" style="padding: 8px 12px; width: 100%;">
+                    <p class="text-xs text-muted mt-1">Format: JPG, PNG. Maks 2 MB.</p>
+                </div>
+                <div class="flex justify-end gap-3 mt-6">
+                    <button type="button" onclick="closeModal('modal-avatar')" class="btn-ghost">Batal</button>
+                    <button type="submit" class="btn-primary">Upload</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-    function openModal(id) {
+        function openAvatarModal(teamId, teamName) {
+        document.getElementById("avatar-team-name").textContent = teamName;
+        document.getElementById("form-avatar").action = "/admin/teams-management/" + teamId + "/avatar";
+        openModal("modal-avatar");
+    }
+
+function openModal(id) {
         document.getElementById(id).style.display = 'block';
         document.body.style.overflow = 'hidden';
     }
+    
     function closeModal(id) {
         document.getElementById(id).style.display = 'none';
         document.body.style.overflow = '';

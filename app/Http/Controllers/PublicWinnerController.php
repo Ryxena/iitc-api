@@ -2,33 +2,34 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Models\Competition;
+use App\Models\Event;
 
 class PublicWinnerController extends Controller
 {
     public function index()
     {
-        $activeEvent = \App\Models\Event::query()->where('is_active', true)->first();
-        if (!$activeEvent) {
+        $activeEvent = Event::query()->where('is_active', true)->first();
+        if (! $activeEvent) {
             return $this->error('No active event found.', 404);
         }
 
         $year = $activeEvent->created_at->format('Y');
 
-        $competitions = \App\Models\Competition::query()
+        $competitions = Competition::query()
             ->where('event_id', $activeEvent->id)
             ->with([
                 'teams' => function ($query) {
                     $query->has('winner')
-                          ->with(['winner', 'leader.participant', 'members.participant']);
-                }
+                        ->with(['winner', 'leader.participant', 'members.participant']);
+                },
             ])
             ->get();
 
         $categories = [];
         foreach ($competitions as $competition) {
             $winnersData = [];
-            
+
             $teams = $competition->teams->sortBy(function ($team) {
                 return $team->winner->rank;
             });
@@ -36,46 +37,46 @@ class PublicWinnerController extends Controller
             foreach ($teams as $team) {
                 $leader = $team->leader;
                 $members = [];
-                
+
                 foreach ($team->members as $member) {
                     $members[] = [
                         'userId' => $member->id,
-                        'name'   => $member->name,
-                        'role'   => 'MEMBER',
+                        'name' => $member->name,
+                        'role' => 'MEMBER',
                         'avatar' => $member->participant->avatar ?? null,
                     ];
                 }
 
                 $winnersData[] = [
-                    'rank'       => $team->winner->rank,
+                    'rank' => $team->winner->rank,
                     'awardTitle' => $team->winner->award_title,
-                    'team'       => [
-                        'code'        => $team->code,
-                        'name'        => $team->name,
+                    'team' => [
+                        'code' => $team->code,
+                        'name' => $team->name,
                         'institution' => $leader->participant->institution ?? null,
-                        'teamPhoto'   => $team->avatar,
-                        'leader'      => [
+                        'teamPhoto' => $team->avatar,
+                        'leader' => [
                             'userId' => $leader->id,
-                            'name'   => $leader->name,
-                            'role'   => 'LEADER',
+                            'name' => $leader->name,
+                            'role' => 'LEADER',
                             'avatar' => $leader->participant->avatar ?? null,
                         ],
-                        'members'     => $members,
-                    ]
+                        'members' => $members,
+                    ],
                 ];
             }
 
             if (count($winnersData) > 0) {
                 $categories[] = [
                     'categoryName' => $competition->name,
-                    'slug'         => $competition->slug,
-                    'winners'      => array_values($winnersData),
+                    'slug' => $competition->slug,
+                    'winners' => array_values($winnersData),
                 ];
             }
         }
 
         return $this->success('Data juara berhasil diambil', [
-            'year'       => (int) $year,
+            'year' => (int) $year,
             'categories' => $categories,
         ]);
     }

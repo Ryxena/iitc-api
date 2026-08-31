@@ -27,7 +27,7 @@ class CompetitionMineController extends Controller
                     },
                     'asMembers.competition'])
                 ->findOrFail(auth()->id());
-                
+
             $teams = [];
             foreach ($user->teams as $team) {
                 $teams[] = $this->transformDBToResponseTeam($team);
@@ -50,15 +50,15 @@ class CompetitionMineController extends Controller
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
 
         return [
-            'teamId'          => $team->id,
+            'teamId' => $team->id,
             'competitionName' => $team->competition->name,
-            'cSlug'           => $team->competition->slug,
-            'teamName'        => $team->name,
-            'avatar'          => $team->avatar,
-            'isSubmit'        => isset($team->submission),
-            'maxMembers'      => $team->competition->max_members,
-            'currentMembers'  => $team->members_count + 1,
-            'isActive'        => $paymentStatus,
+            'cSlug' => $team->competition->slug,
+            'teamName' => $team->name,
+            'avatar' => $team->avatar,
+            'isSubmit' => isset($team->submission),
+            'maxMembers' => $team->competition->max_members,
+            'currentMembers' => $team->members_count + 1,
+            'isActive' => $paymentStatus,
         ];
     }
 }

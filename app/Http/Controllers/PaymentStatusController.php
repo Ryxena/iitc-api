@@ -24,8 +24,8 @@ class PaymentStatusController extends Controller
 
         $paymentStatusData = [
             'team_id' => $team->id,
-            'status'  => $request->input('isApprove') ? PaymentStatusHelper::VALID : PaymentStatusHelper::INVALID,
-            'reason'  => $request->input('reason'),
+            'status' => $request->input('isApprove') ? PaymentStatusHelper::VALID : PaymentStatusHelper::INVALID,
+            'reason' => $request->input('reason'),
         ];
 
         $paymentStatus = PaymentStatus::query()->updateOrCreate(
@@ -36,8 +36,8 @@ class PaymentStatusController extends Controller
         return $this->success('success update payment status', [
             'payment' => [
                 'team_id' => $teamId,
-                'status'  => $paymentStatus->status,
-                'reason'  => $paymentStatus->reason,
+                'status' => $paymentStatus->status,
+                'reason' => $paymentStatus->reason,
             ],
         ]);
     }

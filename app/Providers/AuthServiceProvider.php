@@ -2,16 +2,16 @@
 
 namespace App\Providers;
 
-use App\Models\PaymentStatus;
 use App\Models\Category;
 use App\Models\Competition;
 use App\Models\Payment;
+use App\Models\PaymentStatus;
+use App\Models\SeminarRegistration;
 use App\Models\User;
 use App\Policies\CategoryPolicy;
 use App\Policies\CompetitionPolicy;
 use App\Policies\PaymentPolicy;
 use App\Policies\PaymentStatusPolicy;
-use App\Models\SeminarRegistration;
 use App\Policies\SeminarRegistrationPolicy;
 use App\Policies\UserPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;

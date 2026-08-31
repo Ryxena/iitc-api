@@ -10,8 +10,6 @@ use App\Models\Member;
 use App\Models\PaymentStatus;
 use App\Models\SeminarRegistration;
 use App\Models\Team;
-use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -21,10 +19,10 @@ class DashboardController extends Controller
         $activeEvent = Event::query()->where('is_active', true)->first();
 
         $competitionIds = collect();
-        $competitions   = collect();
+        $competitions = collect();
 
         if ($activeEvent) {
-            $competitions   = Competition::query()
+            $competitions = Competition::query()
                 ->where('event_id', $activeEvent->id)
                 ->withCount(['teams', 'teams as teams_with_payment_count' => function ($q) {
                     $q->whereHas('payment');
@@ -46,7 +44,7 @@ class DashboardController extends Controller
             ->toArray();
 
         $pendingCount = $paymentCounts[PaymentStatusHelper::PENDING] ?? 0;
-        $validCount   = $paymentCounts[PaymentStatusHelper::VALID] ?? 0;
+        $validCount = $paymentCounts[PaymentStatusHelper::VALID] ?? 0;
         $invalidCount = $paymentCounts[PaymentStatusHelper::INVALID] ?? 0;
 
         // Teams without any payment status (uploaded proof but no status yet)
@@ -85,14 +83,13 @@ class DashboardController extends Controller
             ->map(fn ($r) => $r->count);
 
         // Fill missing days with 0
-        $labels    = [];
+        $labels = [];
         $chartData = [];
         for ($i = 29; $i >= 0; $i--) {
-            $date        = now()->subDays($i)->format('Y-m-d');
-            $labels[]    = now()->subDays($i)->format('d M');
+            $date = now()->subDays($i)->format('Y-m-d');
+            $labels[] = now()->subDays($i)->format('d M');
             $chartData[] = $timeline[$date] ?? 0;
         }
-
 
         return view('admin.dashboard', compact(
             'activeEvent',

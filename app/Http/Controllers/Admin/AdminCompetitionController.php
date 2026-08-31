@@ -6,9 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\CategoryCompetition;
 use App\Models\Competition;
-use App\Models\Criterion;
 use App\Models\Event;
-use App\Models\TechStack;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -30,7 +28,7 @@ class AdminCompetitionController extends Controller
             : collect();
 
         $allCategories = Category::query()->orderBy('name')->get();
-        $allEvents     = Event::query()->orderByDesc('created_at')->get();
+        $allEvents = Event::query()->orderByDesc('created_at')->get();
 
         return view('admin.competitions.index', compact(
             'competitions',
@@ -43,35 +41,35 @@ class AdminCompetitionController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name'           => ['required', 'string', 'max:255'],
-            'deadline'       => ['required', 'date'],
-            'max_members'    => ['required', 'integer', 'min:1'],
-            'price'          => ['required', 'numeric', 'min:0'],
-            'description'    => ['nullable', 'string'],
-            'guide_book'     => ['nullable', 'string', 'max:500'],
-            'group_wa'       => ['nullable', 'url', 'max:500'],
-            'event_id'       => ['required', 'exists:events,id'],
-            'categories'     => ['nullable', 'array'],
-            'categories.*'   => ['exists:categories,id'],
-            'cover'          => ['nullable', 'image', 'max:3072'],
+            'name' => ['required', 'string', 'max:255'],
+            'deadline' => ['required', 'date'],
+            'max_members' => ['required', 'integer', 'min:1'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'description' => ['nullable', 'string'],
+            'guide_book' => ['nullable', 'string', 'max:500'],
+            'group_wa' => ['nullable', 'url', 'max:500'],
+            'event_id' => ['required', 'exists:events,id'],
+            'categories' => ['nullable', 'array'],
+            'categories.*' => ['exists:categories,id'],
+            'cover' => ['nullable', 'image', 'max:3072'],
         ]);
 
         $coverUrl = null;
         if ($request->hasFile('cover')) {
-            $path     = $request->file('cover')->store('competition/cover', ['disk' => 'public']);
+            $path = $request->file('cover')->store('competition/cover', ['disk' => 'public']);
             $coverUrl = Storage::disk('public')->url($path);
         }
 
         $competition = Competition::query()->create([
-            'name'        => $data['name'],
-            'deadline'    => $data['deadline'],
+            'name' => $data['name'],
+            'deadline' => $data['deadline'],
             'max_members' => $data['max_members'],
-            'price'       => $data['price'],
+            'price' => $data['price'],
             'description' => $data['description'] ?? null,
-            'guide_book'  => $data['guide_book'] ?? null,
-            'group_wa'    => $data['group_wa'] ?? null,
-            'event_id'    => $data['event_id'],
-            'cover'       => $coverUrl,
+            'guide_book' => $data['guide_book'] ?? null,
+            'group_wa' => $data['group_wa'] ?? null,
+            'event_id' => $data['event_id'],
+            'cover' => $coverUrl,
         ]);
 
         if (! empty($data['categories'])) {
@@ -90,27 +88,27 @@ class AdminCompetitionController extends Controller
         $competition = Competition::query()->where('slug', $slug)->firstOrFail();
 
         $data = $request->validate([
-            'name'         => ['required', 'string', 'max:255'],
-            'deadline'     => ['required', 'date'],
-            'max_members'  => ['required', 'integer', 'min:1'],
-            'price'        => ['required', 'numeric', 'min:0'],
-            'description'  => ['nullable', 'string'],
-            'guide_book'   => ['nullable', 'string', 'max:500'],
-            'group_wa'     => ['nullable', 'url', 'max:500'],
-            'categories'   => ['nullable', 'array'],
+            'name' => ['required', 'string', 'max:255'],
+            'deadline' => ['required', 'date'],
+            'max_members' => ['required', 'integer', 'min:1'],
+            'price' => ['required', 'numeric', 'min:0'],
+            'description' => ['nullable', 'string'],
+            'guide_book' => ['nullable', 'string', 'max:500'],
+            'group_wa' => ['nullable', 'url', 'max:500'],
+            'categories' => ['nullable', 'array'],
             'categories.*' => ['exists:categories,id'],
-            'cover'        => ['nullable', 'image', 'max:3072'],
+            'cover' => ['nullable', 'image', 'max:3072'],
             'delete_cover' => ['nullable', 'boolean'],
         ]);
 
         $updateData = [
-            'name'        => $data['name'],
-            'deadline'    => $data['deadline'],
+            'name' => $data['name'],
+            'deadline' => $data['deadline'],
             'max_members' => $data['max_members'],
-            'price'       => $data['price'],
+            'price' => $data['price'],
             'description' => $data['description'] ?? null,
-            'guide_book'  => $data['guide_book'] ?? null,
-            'group_wa'    => $data['group_wa'] ?? null,
+            'guide_book' => $data['guide_book'] ?? null,
+            'group_wa' => $data['group_wa'] ?? null,
         ];
 
         if ($request->hasFile('cover')) {
@@ -121,7 +119,7 @@ class AdminCompetitionController extends Controller
             }
             $path = $request->file('cover')->store('competition/cover', ['disk' => 'public']);
             $updateData['cover'] = Storage::disk('public')->url($path);
-        } elseif (!empty($data['delete_cover'])) {
+        } elseif (! empty($data['delete_cover'])) {
             // Delete cover without replacing
             if ($competition->cover) {
                 $oldPath = ltrim(str_replace('/storage', '', parse_url($competition->cover, PHP_URL_PATH)), '/');
@@ -142,7 +140,7 @@ class AdminCompetitionController extends Controller
     public function destroy(string $slug): RedirectResponse
     {
         $competition = Competition::query()->where('slug', $slug)->firstOrFail();
-        $name        = $competition->name;
+        $name = $competition->name;
         $competition->delete();
 
         return redirect()->back()->with('success', "Kompetisi \"{$name}\" berhasil dihapus.");

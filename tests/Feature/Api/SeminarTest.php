@@ -23,7 +23,7 @@ it('can get user specific seminar data', function () {
     $user = User::factory()->create();
     $user->assignRole('User');
 
-    $response = $this->actingAs($user)->getJson('/api/seminar/' . $user->id);
+    $response = $this->actingAs($user)->getJson('/api/seminar/'.$user->id);
 
     expect($response->status())->toBeIn([200, 403, 404]);
 });
@@ -33,7 +33,7 @@ it('can get user specific seminar data as admin', function () {
     $admin->assignRole('User'); // Actually Admin
     $user = User::factory()->create();
 
-    $response = $this->actingAs($admin)->getJson('/api/seminar/' . $user->id . '/admin');
+    $response = $this->actingAs($admin)->getJson('/api/seminar/'.$user->id.'/admin');
 
     expect($response->status())->toBeIn([200, 403, 404]);
 });
@@ -42,7 +42,7 @@ it('can update user specific seminar data', function () {
     $user = User::factory()->create();
     $user->assignRole('User');
 
-    $response = $this->actingAs($user)->postJson('/api/seminar/' . $user->id . '/update', [
+    $response = $this->actingAs($user)->postJson('/api/seminar/'.$user->id.'/update', [
         'isApprove' => true,
         'reason' => 'Approved',
     ]);

@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\PaymentStatus;
+use App\Models\Seminar;
 use App\Models\SeminarRegistration;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\CertificateService;
+use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -18,21 +22,37 @@ class SeminarController extends Controller
      */
     public function index(): JsonResponse
     {
+
         $registrations = SeminarRegistration::query()
             ->with('user')
             ->get();
 
-        $data = $registrations->map(fn (SeminarRegistration $reg) => [
-            'userId'            => $reg->user_id,
-            'name'              => $reg->user->name ?? null,
-            'email'             => $reg->user->email ?? null,
-            'phone'             => $reg->user->phone ?? null,
-            'attended'          => $reg->attended,
-            'certificateNumber' => $reg->certificate_number,
-            'certificateUrl'    => $reg->certificate_path
+        $data = $registrations->map(function (SeminarRegistration $reg) {
+            $user = $reg->user;
+            $team = $user ? TeamController::findUserTeam($user) : null;
+            $winner = $team?->winner;
+            $participantLabel = Setting::get('non_winner_label', 'Partisipasi');
+
+            $certificateSeminar = $reg->certificate_path
                 ? Storage::disk('public')->url($reg->certificate_path)
-                : null,
-        ]);
+                : null;
+
+            return [
+                'userId' => $reg->user_id,
+                'name' => $user->name ?? null,
+                'email' => $user->email ?? null,
+                'phone' => $user->phone ?? null,
+                'attended' => $reg->attended,
+                'certificateNumber' => $reg->certificate_number,
+                'certificateSeminar' => $certificateSeminar,
+                'teamId' => $team?->id,
+                'teamName' => $team?->name,
+                'competitionName' => $team?->competition?->name,
+                'winnerStatus' => $winner
+                    ? "{$winner->award_title} (Rank {$winner->rank})"
+                    : ($team ? $participantLabel : null),
+            ];
+        });
 
         return $this->success('success get all seminar registrations', ['registrations' => $data]);
     }
@@ -53,14 +73,14 @@ class SeminarController extends Controller
         }
 
         SeminarRegistration::query()->create([
-            'user_id'  => $user->id,
+            'user_id' => $user->id,
             'attended' => false,
         ]);
 
         return $this->success('Seminar registration successful. See you there!', [
             'userId' => $user->id,
-            'name'   => $user->name,
-            'email'  => $user->email,
+            'name' => $user->name,
+            'email' => $user->email,
         ]);
     }
 
@@ -80,12 +100,12 @@ class SeminarController extends Controller
         }
 
         return $this->success('success get seminar registration', [
-            'userId'            => $user->id,
-            'name'              => $user->name,
-            'email'             => $user->email,
-            'attended'          => $registration->attended,
+            'userId' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'attended' => $registration->attended,
             'certificateNumber' => $registration->certificate_number,
-            'certificateUrl'    => $registration->certificate_path
+            'certificateUrl' => $registration->certificate_path
                 ? Storage::disk('public')->url($registration->certificate_path)
                 : null,
         ]);
@@ -114,7 +134,7 @@ class SeminarController extends Controller
             $registration->update(['attended' => false]);
 
             return $this->success('Attendance marked as not attended.', [
-                'userId'   => $userId,
+                'userId' => $userId,
                 'attended' => false,
             ]);
         }
@@ -122,10 +142,10 @@ class SeminarController extends Controller
         // Already has a certificate — just return existing URL
         if ($registration->certificate_path !== null) {
             return $this->success('Attendance already verified, certificate already issued.', [
-                'userId'            => $userId,
-                'attended'          => true,
+                'userId' => $userId,
+                'attended' => true,
                 'certificateNumber' => $registration->certificate_number,
-                'certificateUrl'    => Storage::disk('public')->url($registration->certificate_path),
+                'certificateUrl' => Storage::disk('public')->url($registration->certificate_path),
             ]);
         }
 
@@ -133,40 +153,68 @@ class SeminarController extends Controller
         $cert = $this->certificateService->generate($user->name, $user->id);
 
         $registration->update([
-            'attended'           => true,
+            'attended' => true,
             'certificate_number' => $cert['certificate_number'],
-            'certificate_path'   => $cert['certificate_path'],
+            'certificate_path' => $cert['certificate_path'],
         ]);
 
         return $this->success('Attendance verified and certificate generated successfully.', [
-            'userId'            => $userId,
-            'attended'          => true,
+            'userId' => $userId,
+            'attended' => true,
             'certificateNumber' => $cert['certificate_number'],
-            'certificateUrl'    => $cert['url'],
+            'certificateUrl' => $cert['url'],
         ]);
     }
 
-    /**
-     * [USER] Download the user's certificate PDF.
-     */
-    public function downloadCertificate(string $userId): mixed
+    public function myCertificate(Request $request): JsonResponse
     {
-        $registration = SeminarRegistration::query()
-            ->where('user_id', $userId)
-            ->first();
+        $user = $request->user();
+        $team = TeamController::findUserTeam($user);
+        $winner = $team?->winner;
+        $participantLabel = Setting::get('non_winner_label', 'Partisipasi');
 
-        if ($registration === null || $registration->certificate_path === null) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Certificate not yet issued. Please wait for attendance verification.',
-            ], 404);
+        if (! $team) {
+            return $this->error('Didnt have team cannot create certificate', 404);
         }
 
-        $path = Storage::disk('public')->path($registration->certificate_path);
+        // Check registration deadline — team created before deadline is eligible
+        $deadline = Carbon::parse($team->competition->deadline);
+        if ($team->created_at->gt($deadline)) {
+            return $this->error('Cannot create certificate because registration is closed', 403);
+        }
 
-        return response()->file($path, [
-            'Content-Type'        => 'application/pdf',
-            'Content-Disposition' => 'inline; filename="certificate-' . $registration->certificate_number . '.pdf"',
+        // Check payment status
+        $paymentStatus = $team->paymentStatus->status ?? null;
+        if ($paymentStatus !== PaymentStatus::VALID) {
+            return $this->error('Cannot create certificate because payment is not done yet / not valid', 403);
+        }
+
+        // Create registration if not exists, then generate number
+        $registration = SeminarRegistration::query()->firstOrCreate(
+            ['user_id' => $user->id],
+            ['attended' => true],
+        );
+
+        if (! $registration->certificate_number) {
+            $number = $this->certificateService->generateCertificateNumber();
+            $registration->update(['certificate_number' => $number]);
+            $registration->refresh();
+        }
+
+        return $this->success('success get my certificate', [
+            'seminarName' => Seminar::where('is_active', true)->value('title'),
+            'name' => $user->name,
+            'email' => $user->email,
+            'teamId' => $team->id,
+            'teamName' => $team->name,
+            'competitionName' => $team->competition?->name,
+            'certificateNumber' => $registration->certificate_number,
+            'certificateUrl' => $registration->certificate_path
+                ? Storage::disk('public')->url($registration->certificate_path)
+                : null,
+            'winnerStatus' => $winner
+                ? "{$winner->award_title} (Rank {$winner->rank})"
+                : $participantLabel,
         ]);
     }
 }

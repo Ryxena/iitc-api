@@ -9,6 +9,7 @@ use App\Models\Team;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class AdminTeamManagementController extends Controller
@@ -28,8 +29,8 @@ class AdminTeamManagementController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('code', 'like', "%{$search}%")
-                  ->orWhere('title', 'like', "%{$search}%");
+                    ->orWhere('code', 'like', "%{$search}%")
+                    ->orWhere('title', 'like', "%{$search}%");
             });
         }
 
@@ -42,27 +43,26 @@ class AdminTeamManagementController extends Controller
         return view('admin.teams-management.index', compact('teams', 'search', 'competitions', 'competitionId', 'activeEvent'));
     }
 
-
     public function update(Request $request, Team $team): RedirectResponse
     {
         $validated = $request->validate([
-            'leader_email'   => 'required|email|exists:users,email',
+            'leader_email' => 'required|email|exists:users,email',
             'competition_id' => 'required|exists:competitions,id',
-            'name'           => 'nullable|string|max:255',
-            'code'           => 'nullable|string|max:255|unique:teams,code,' . $team->id,
-            'title'          => 'nullable|string|max:255',
-            'is_active'      => 'boolean',
+            'name' => 'nullable|string|max:255',
+            'code' => 'nullable|string|max:255|unique:teams,code,'.$team->id,
+            'title' => 'nullable|string|max:255',
+            'is_active' => 'boolean',
         ]);
 
         $leader = User::query()->where('email', $validated['leader_email'])->firstOrFail();
 
         $team->update([
-            'leader_id'      => $leader->id,
+            'leader_id' => $leader->id,
             'competition_id' => $validated['competition_id'],
-            'name'           => $validated['name'],
-            'code'           => $validated['code'],
-            'title'          => $validated['title'],
-            'is_active'      => $validated['is_active'] ?? false,
+            'name' => $validated['name'],
+            'code' => $validated['code'],
+            'title' => $validated['title'],
+            'is_active' => $validated['is_active'] ?? false,
         ]);
 
         return redirect()->back()->with('success', "Tim \"{$team->name}\" berhasil diperbarui.");
@@ -74,5 +74,20 @@ class AdminTeamManagementController extends Controller
         $team->delete();
 
         return redirect()->back()->with('success', "Tim \"{$name}\" berhasil dihapus.");
+    }
+
+    public function uploadAvatar(Request $request, Team $team): RedirectResponse
+    {
+        $request->validate(['avatar' => 'required|image|mimes:jpg,jpeg,png|max:2048']);
+
+        if ($team->avatar) {
+            $oldPath = str_replace(Storage::disk('public')->url(''), '', $team->avatar);
+            Storage::disk('public')->delete($oldPath);
+        }
+
+        $path = $request->file('avatar')->store('team/avatar', 'public');
+        $team->update(['avatar' => Storage::disk('public')->url($path)]);
+
+        return redirect()->back()->with('success', "Avatar tim \"{$team->name}\" berhasil diupload.");
     }
 }

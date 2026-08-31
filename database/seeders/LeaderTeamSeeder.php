@@ -2,8 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Competition;
 use App\Models\Member;
 use App\Models\Participant;
+use App\Models\Payment;
+use App\Models\PaymentStatus;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
@@ -25,10 +28,10 @@ class LeaderTeamSeeder extends Seeder
         $leader = User::firstOrCreate(
             ['email' => 'useryeat@gmail.com'],
             [
-                'name'              => 'Team Leader',
-                'password'          => 'myPassword',
+                'name' => 'Team Leader',
+                'password' => 'myPassword',
                 'email_verified_at' => now(),
-                'phone'             => 6281234567890,
+                'phone' => 6281234567890,
             ]
         );
 
@@ -39,10 +42,10 @@ class LeaderTeamSeeder extends Seeder
         Participant::firstOrCreate(
             ['user_id' => $leader->id],
             [
-                'grade'             => 'pelajar',
-                'gender'            => 'male',
+                'grade' => 'pelajar',
+                'gender' => 'male',
                 'student_id_number' => '123456789',
-                'institution'       => 'SMAN 1 Jakarta',
+                'institution' => 'SMAN 1 Jakarta',
             ]
         );
 
@@ -57,10 +60,10 @@ class LeaderTeamSeeder extends Seeder
             $memberUser = User::firstOrCreate(
                 ['email' => $data['email']],
                 [
-                    'name'              => $data['name'],
-                    'password'          => 'myPassword',
+                    'name' => $data['name'],
+                    'password' => 'myPassword',
                     'email_verified_at' => now(),
-                    'phone'             => fake()->numerify('628##########'),
+                    'phone' => fake()->numerify('628##########'),
                 ]
             );
 
@@ -71,10 +74,10 @@ class LeaderTeamSeeder extends Seeder
             Participant::firstOrCreate(
                 ['user_id' => $memberUser->id],
                 [
-                    'grade'             => 'pelajar',
-                    'gender'            => 'female',
+                    'grade' => 'pelajar',
+                    'gender' => 'female',
                     'student_id_number' => Str::random(8),
-                    'institution'       => 'SMAN 2 Jakarta',
+                    'institution' => 'SMAN 2 Jakarta',
                 ]
             );
 
@@ -82,21 +85,21 @@ class LeaderTeamSeeder extends Seeder
         }
 
         // ── 3. Team ────────────────────────────────────────────────────────────
-        $competition = \App\Models\Competition::first();
+        $competition = Competition::first();
         if (! $competition) {
             $this->call(CompetitionSeeder::class);
-            $competition = \App\Models\Competition::first();
+            $competition = Competition::first();
         }
 
         $team = Team::firstOrCreate(
             [
-                'leader_id'      => $leader->id,
+                'leader_id' => $leader->id,
                 'competition_id' => $competition->id,
             ],
             [
-                'name'      => 'Team Alpha',
-                'code'      => strtoupper(Str::random(6)),
-                'title'     => 'Our Awesome Project',
+                'name' => 'Team Alpha',
+                'code' => strtoupper(Str::random(6)),
+                'title' => 'Our Awesome Project',
                 'is_active' => true,
             ]
         );
@@ -110,22 +113,22 @@ class LeaderTeamSeeder extends Seeder
         }
 
         // ── 5. Payment Proof & Status ──────────────────────────────────────────
-        \App\Models\Payment::firstOrCreate(
+        Payment::firstOrCreate(
             ['team_id' => $team->id],
             ['transfer_receipt' => 'https://via.placeholder.com/600x400.png?text=Fake+Receipt']
         );
 
-        \App\Models\PaymentStatus::firstOrCreate(
+        PaymentStatus::firstOrCreate(
             ['team_id' => $team->id],
             [
-                'status' => \App\Helpers\PaymentStatus::VALID, 
-                'reason' => 'Automatically validated by seeder'
+                'status' => \App\Helpers\PaymentStatus::VALID,
+                'reason' => 'Automatically validated by seeder',
             ]
         );
 
         $this->command->info('LeaderTeamSeeder done.');
         $this->command->info("  Leader  → user@gmail.com / myPassword  (team_id: {$team->id})");
-        $this->command->info("  Member1 → member1@gmail.com / myPassword");
-        $this->command->info("  Member2 → member2@gmail.com / myPassword");
+        $this->command->info('  Member1 → member1@gmail.com / myPassword');
+        $this->command->info('  Member2 → member2@gmail.com / myPassword');
     }
 }

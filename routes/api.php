@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminSettingController;
+use App\Http\Controllers\Admin\SeminarAdminController;
 use App\Http\Controllers\Admin\TeamController as AdminTeamController;
+use App\Http\Controllers\Admin\WinnerController;
 use App\Http\Controllers\AdminGetDetailTeamController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CompetitionController;
@@ -20,6 +23,7 @@ use App\Http\Controllers\PaymentStatusController;
 use App\Http\Controllers\PublicMediaPartnerController;
 use App\Http\Controllers\PublicSeminarController;
 use App\Http\Controllers\PublicSponsorController;
+use App\Http\Controllers\PublicWinnerController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SeminarController;
 use App\Http\Controllers\TeamController;
@@ -59,7 +63,7 @@ Route::get('/seminars', [PublicSeminarController::class, 'index']);
 Route::get('/seminars/{id}', [PublicSeminarController::class, 'show']);
 
 // Winners (public read)
-Route::get('/winners', [\App\Http\Controllers\PublicWinnerController::class, 'index']);
+Route::get('/winners', [PublicWinnerController::class, 'index']);
 
 // Sponsors (public read, sorted by tier)
 Route::get('/sponsors', PublicSponsorController::class);
@@ -73,7 +77,6 @@ Route::get('/media-partners', PublicMediaPartnerController::class);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [LogoutController::class, 'store']);
-
 
     // ----------------------------------------------------------
     // ADMIN ROUTES
@@ -110,15 +113,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::prefix('/admin')->group(function () {
         Route::get('/teams', [AdminTeamController::class, 'index']);
         Route::get('/teams/{teamId}', [AdminTeamController::class, 'show']);
-        
+
         // Admin — Winners
-        Route::post('/winners', [\App\Http\Controllers\Admin\WinnerController::class, 'store']);
-        Route::delete('/winners/{teamId}', [\App\Http\Controllers\Admin\WinnerController::class, 'destroy']);
+        Route::post('/winners', [WinnerController::class, 'store']);
+        Route::delete('/winners/{teamId}', [WinnerController::class, 'destroy']);
+
+        // Admin — Seminar Certificates
+        Route::post('/seminar/{userId}/upload-certificate', [SeminarAdminController::class, 'uploadCertificate']);
+
+        // Admin — Team Avatar & Name
+        Route::post('/teams/{teamId}/avatar', [AdminTeamController::class, 'uploadAvatar']);
+        Route::put('/teams/{teamId}/name', [AdminTeamController::class, 'updateName']);
+
+        // Admin — Settings
+        Route::put('/settings/non-winner-label', [AdminSettingController::class, 'updateNonWinnerLabel']);
     });
-    Route::get('/teams/{teamId}/admin', [App\Http\Controllers\AdminGetDetailTeamController::class, 'show']);
+    Route::get('/teams/{teamId}/admin', [AdminGetDetailTeamController::class, 'show']);
 
     // Admin — Payment
-    Route::post('/payment/{teamId}/payment-status', [App\Http\Controllers\PaymentStatusController::class, 'update']);
+    Route::post('/payment/{teamId}/payment-status', [PaymentStatusController::class, 'update']);
 
     // ----------------------------------------------------------
     // USER / PARTICIPANT ROUTES
@@ -133,11 +146,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/individual/{competitionSlug}', JoinIndividualCompetitionController::class);
 
     // Seminar
-    // Route::get('/seminar', [SeminarController::class, 'index']);
-    // Route::post('/seminar/register', [SeminarController::class, 'register']);
-    // Route::get('/seminar/{userId}', [SeminarController::class, 'show']);
-    // Route::post('/seminar/{userId}/verify-attendance', [SeminarController::class, 'verifyAttendance']);
-    // Route::get('/seminar/{userId}/certificate', [SeminarController::class, 'downloadCertificate']);
+    Route::get('/seminar', [SeminarController::class, 'index']);
+    Route::get('/certificate/mine', [SeminarController::class, 'myCertificate']);
 
     // Teams
     Route::get('/teams', [TeamController::class, 'index']);

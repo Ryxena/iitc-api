@@ -35,7 +35,7 @@ it('can update a category if authorized', function () {
     $user->assignRole('User');
     $category = Category::factory()->create();
 
-    $response = $this->actingAs($user)->putJson('/api/competitions/categories/' . $category->id, [
+    $response = $this->actingAs($user)->putJson('/api/competitions/categories/'.$category->id, [
         'name' => 'Updated Category',
     ]);
 
@@ -47,7 +47,7 @@ it('can delete a category if authorized', function () {
     $user->assignRole('User');
     $category = Category::factory()->create();
 
-    $response = $this->actingAs($user)->deleteJson('/api/competitions/categories/' . $category->id);
+    $response = $this->actingAs($user)->deleteJson('/api/competitions/categories/'.$category->id);
 
     expect($response->status())->toBeIn([200, 403]);
 });

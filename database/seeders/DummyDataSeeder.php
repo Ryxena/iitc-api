@@ -2,11 +2,15 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\PaymentStatus;
+use App\Models\Competition;
 use App\Models\Member;
 use App\Models\Participant;
+use App\Models\Payment;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 
 class DummyDataSeeder extends Seeder
 {
@@ -19,16 +23,16 @@ class DummyDataSeeder extends Seeder
         $users = User::factory(10)->create();
         $teams = collect();
 
-        $competitionIds = \App\Models\Competition::pluck('id');
+        $competitionIds = Competition::pluck('id');
         if ($competitionIds->isEmpty()) {
             $this->call(CompetitionSeeder::class);
-            $competitionIds = \App\Models\Competition::pluck('id');
+            $competitionIds = Competition::pluck('id');
         }
 
         foreach ($users as $user) {
             $user->assignRole('User');
             $team = Team::factory()->create([
-                'leader_id'      => $user->id,
+                'leader_id' => $user->id,
                 'competition_id' => $competitionIds->random(),
             ]);
             $teams->push($team);
@@ -37,7 +41,7 @@ class DummyDataSeeder extends Seeder
         $this->command->info('Creating 30 Members for the Teams (this may take a few minutes)...');
         $members = User::factory(30)->create();
         $memberIndex = 0;
-        
+
         foreach ($teams as $team) {
             for ($j = 0; $j < 3; $j++) {
                 Member::factory()->create([
@@ -57,45 +61,44 @@ class DummyDataSeeder extends Seeder
         }
 
         $this->command->info('Creating dummy payments and payment statuses for testing dashboard...');
-        
+
         // Buat folder jika belum ada
         $receiptDir = storage_path('app/public/receipt');
-        if (!file_exists($receiptDir)) {
+        if (! file_exists($receiptDir)) {
             mkdir($receiptDir, 0755, true);
         }
 
         // Buat satu file dummy image menggunakan GD library bawaan PHP
         $dummyImageName = 'dummy_receipt_seeder.png';
-        $dummyImagePath = $receiptDir . '/' . $dummyImageName;
-        
-        if (!file_exists($dummyImagePath)) {
+        $dummyImagePath = $receiptDir.'/'.$dummyImageName;
+
+        if (! file_exists($dummyImagePath)) {
             $image = imagecreate(600, 800);
             imagecolorallocate($image, 30, 33, 48); // background color
             $textColor = imagecolorallocate($image, 200, 200, 255);
-            imagestring($image, 5, 180, 350, "BUKTI PEMBAYARAN DUMMY", $textColor);
-            imagestring($image, 5, 230, 380, "IITC SEEDER", $textColor);
+            imagestring($image, 5, 180, 350, 'BUKTI PEMBAYARAN DUMMY', $textColor);
+            imagestring($image, 5, 230, 380, 'IITC SEEDER', $textColor);
             imagepng($image, $dummyImagePath);
             imagedestroy($image);
         }
 
-        $statuses = [\App\Helpers\PaymentStatus::VALID, \App\Helpers\PaymentStatus::PENDING, \App\Helpers\PaymentStatus::INVALID];
-        
+        $statuses = [PaymentStatus::VALID, PaymentStatus::PENDING, PaymentStatus::INVALID];
+
         foreach ($teams as $index => $team) {
             // Gunakan format URL yang sama dengan logic Controller: Storage::disk('public')->url()
-            $receiptUrl = \Illuminate\Support\Facades\Storage::disk('public')->url('receipt/' . $dummyImageName);
+            $receiptUrl = Storage::disk('public')->url('receipt/'.$dummyImageName);
 
-            \App\Models\Payment::query()->create([
-                'team_id'          => $team->id,
+            Payment::query()->create([
+                'team_id' => $team->id,
                 'transfer_receipt' => $receiptUrl,
             ]);
 
             $status = $statuses[$index % 3];
             \App\Models\PaymentStatus::query()->create([
                 'team_id' => $team->id,
-                'status'  => $status,
-                'reason'  => ($status === \App\Helpers\PaymentStatus::INVALID) ? 'Bukti bayar blur atau nominal tidak sesuai (Contoh penolakan)' : '',
+                'status' => $status,
+                'reason' => ($status === PaymentStatus::INVALID) ? 'Bukti bayar blur atau nominal tidak sesuai (Contoh penolakan)' : '',
             ]);
         }
     }
 }
-

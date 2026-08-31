@@ -33,7 +33,7 @@ class JoinTeamController extends Controller
                             $q->where('user_id', $user->id);
                         });
                 })->exists();
-                
+
             if ($hasTeamInEvent) {
                 return $this->error('You are already a member or leader of a team in this event.', 400);
             }

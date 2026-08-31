@@ -21,7 +21,7 @@ class CategoryController extends Controller
     public function store(StoreCategoryRequest $request): JsonResponse
     {
         $this->authorize('create', Category::class);
-        
+
         $category = Category::query()->create([
             'name' => $request->name,
         ]);

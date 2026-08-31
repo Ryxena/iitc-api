@@ -22,7 +22,7 @@ class AdminMediaPartnerController extends Controller
         }
 
         $mediaPartners = $query->paginate(15)->withQueryString();
-        $totalCount    = MediaPartner::count();
+        $totalCount = MediaPartner::count();
 
         return view('admin.media-partners.index', compact('mediaPartners', 'search', 'totalCount'));
     }
@@ -30,7 +30,7 @@ class AdminMediaPartnerController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
@@ -47,7 +47,7 @@ class AdminMediaPartnerController extends Controller
     public function update(Request $request, MediaPartner $mediaPartner): RedirectResponse
     {
         $validated = $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
+            'name' => ['required', 'string', 'max:255'],
             'image' => ['nullable', 'image', 'max:2048'],
         ]);
 

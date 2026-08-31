@@ -16,7 +16,7 @@ class AdminSponsorController extends Controller
     public function index(Request $request): View
     {
         $search = $request->query('search', '');
-        $tier   = $request->query('tier', 'ALL');
+        $tier = $request->query('tier', 'ALL');
 
         $query = Sponsor::query()->latest();
 
@@ -28,8 +28,8 @@ class AdminSponsorController extends Controller
             $query->where('tier', strtolower($tier));
         }
 
-        $sponsors    = $query->paginate(15)->withQueryString();
-        $totalCount  = Sponsor::count();
+        $sponsors = $query->paginate(15)->withQueryString();
+        $totalCount = Sponsor::count();
 
         $tierCounts = [];
         foreach (self::TIERS as $t) {
@@ -42,8 +42,8 @@ class AdminSponsorController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
-            'tier'  => ['required', 'in:platinum,gold,silver,bronze,in-kind'],
+            'name' => ['required', 'string', 'max:255'],
+            'tier' => ['required', 'in:platinum,gold,silver,bronze,in-kind'],
             'image' => ['nullable', 'image', 'max:2048'],
         ]);
 
@@ -60,8 +60,8 @@ class AdminSponsorController extends Controller
     public function update(Request $request, Sponsor $sponsor): RedirectResponse
     {
         $validated = $request->validate([
-            'name'  => ['required', 'string', 'max:255'],
-            'tier'  => ['required', 'in:platinum,gold,silver,bronze,in-kind'],
+            'name' => ['required', 'string', 'max:255'],
+            'tier' => ['required', 'in:platinum,gold,silver,bronze,in-kind'],
             'image' => ['nullable', 'image', 'max:2048'],
         ]);
 

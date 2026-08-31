@@ -27,7 +27,7 @@ it('can show competition details', function () {
     Event::factory()->create(['is_active' => true]);
     $competition = Competition::factory()->create();
 
-    $response = $this->getJson('/api/competitions/' . $competition->slug);
+    $response = $this->getJson('/api/competitions/'.$competition->slug);
 
     $response->assertSuccessful();
 });
@@ -65,7 +65,7 @@ it('can update a competition if authorized', function () {
     $event = Event::factory()->create(['is_active' => true]);
     $competition = Competition::factory()->create(['event_id' => $event->id]);
 
-    $response = $this->actingAs($user)->postJson('/api/competitions/' . $competition->slug, [
+    $response = $this->actingAs($user)->postJson('/api/competitions/'.$competition->slug, [
         'name' => 'Updated Competition',
         'isIndividu' => false,
         'deadline' => now()->addDays(10)->format('Y-m-d'),
@@ -88,7 +88,7 @@ it('can delete a competition if authorized', function () {
     $event = Event::factory()->create(['is_active' => true]);
     $competition = Competition::factory()->create(['event_id' => $event->id]);
 
-    $response = $this->actingAs($user)->deleteJson('/api/competitions/' . $competition->slug);
+    $response = $this->actingAs($user)->deleteJson('/api/competitions/'.$competition->slug);
 
     expect($response->status())->toBeIn([200, 403]);
 });

@@ -29,7 +29,7 @@ class EventController extends Controller
         }
 
         $event = Event::query()->create([
-            'name'        => $request->name,
+            'name' => $request->name,
             'description' => $request->description,
         ]);
 
@@ -50,7 +50,7 @@ class EventController extends Controller
         }
 
         $event->update([
-            'name'        => $request->name,
+            'name' => $request->name,
             'description' => $request->description,
         ]);
 
@@ -63,7 +63,7 @@ class EventController extends Controller
     {
         $event = Event::query()->findOrFail($eventId);
         $this->authorize('delete', $event);
-        
+
         $event->delete();
 
         return $this->success('Succeed delete event.');

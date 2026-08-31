@@ -3,16 +3,19 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Competition;
+use App\Models\Event;
+use App\Models\Winner;
 use Illuminate\Http\Request;
 
 class AdminWinnerController extends Controller
 {
     public function index()
     {
-        $activeEvent = \App\Models\Event::where('is_active', true)->first();
+        $activeEvent = Event::where('is_active', true)->first();
         $competitions = collect();
         if ($activeEvent) {
-            $competitions = \App\Models\Competition::where('event_id', $activeEvent->id)
+            $competitions = Competition::where('event_id', $activeEvent->id)
                 ->with(['teams' => function ($q) {
                     $q->with(['winner', 'leader.participant'])->whereHas('paymentStatus', function ($sq) {
                         $sq->where('status', 'VALID');
@@ -24,7 +27,7 @@ class AdminWinnerController extends Controller
         return view('admin.winners.index', compact('activeEvent', 'competitions'));
     }
 
-    public function store(\Illuminate\Http\Request $request)
+    public function store(Request $request)
     {
         $request->validate([
             'team_id' => 'required|exists:teams,id',
@@ -32,7 +35,7 @@ class AdminWinnerController extends Controller
             'award_title' => 'required|string',
         ]);
 
-        \App\Models\Winner::updateOrCreate(
+        Winner::updateOrCreate(
             ['team_id' => $request->team_id],
             ['rank' => $request->rank, 'award_title' => $request->award_title]
         );
@@ -42,7 +45,8 @@ class AdminWinnerController extends Controller
 
     public function destroy(string $teamId)
     {
-        \App\Models\Winner::where('team_id', $teamId)->delete();
+        Winner::where('team_id', $teamId)->delete();
+
         return redirect()->back()->with('success', 'Berhasil menghapus data juara.');
     }
 }

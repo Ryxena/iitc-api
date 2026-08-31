@@ -75,7 +75,7 @@ class PaymentAdminController extends Controller
     {
         $request->validate([
             'is_approve' => ['required', 'in:1,0'],
-            'reason'     => ['nullable', 'string', 'max:500'],
+            'reason' => ['nullable', 'string', 'max:500'],
         ]);
 
         $team = Team::query()->findOrFail($teamId);
@@ -87,14 +87,14 @@ class PaymentAdminController extends Controller
         }
 
         $isApprove = (bool) $request->input('is_approve');
-        $status    = $isApprove ? PaymentStatusHelper::VALID : PaymentStatusHelper::INVALID;
+        $status = $isApprove ? PaymentStatusHelper::VALID : PaymentStatusHelper::INVALID;
 
         PaymentStatus::query()->updateOrCreate(
             ['team_id' => $team->id],
             [
                 'team_id' => $team->id,
-                'status'  => $status,
-                'reason'  => $request->input('reason') ?? '',
+                'status' => $status,
+                'reason' => $request->input('reason') ?? '',
             ]
         );
 

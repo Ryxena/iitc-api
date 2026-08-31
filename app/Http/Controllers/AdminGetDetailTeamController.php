@@ -11,7 +11,7 @@ class AdminGetDetailTeamController extends Controller
     public function show(string $teamId): JsonResponse
     {
         $this->authorize('detailPayment', Team::class);
-        
+
         $team = Team::query()->with([
             'paymentStatus',
             'payment',
@@ -21,26 +21,26 @@ class AdminGetDetailTeamController extends Controller
             'members.participant:user_id,avatar',
             'competition:id,name',
         ])->findOrFail($teamId);
-        
+
         $paymentStatus = isset($team->payment) ? PaymentStatus::PENDING : null;
         $paymentStatus = $team->paymentStatus->status ?? $paymentStatus;
         $reason = $team->paymentStatus->reason ?? null;
-        
+
         $teamResponse = [
-            'name'            => $team->name,
-            'code'            => $team->code,
-            'title'           => $team->title,
-            'isActive'        => $paymentStatus,
-            'paymentStatus'   => [
+            'name' => $team->name,
+            'code' => $team->code,
+            'title' => $team->title,
+            'isActive' => $paymentStatus,
+            'paymentStatus' => [
                 'status' => $paymentStatus,
                 'reason' => $reason,
             ],
-            'isSubmit'        => isset($team->submission),
-            'avatar'          => $team->avatar,
+            'isSubmit' => isset($team->submission),
+            'avatar' => $team->avatar,
             'transferReceipt' => $team->payment->transfer_receipt ?? null,
-            'competition'     => $team->competition,
-            'leaderName'      => $team->leader->name,
-            'members'         => $team->members,
+            'competition' => $team->competition,
+            'leaderName' => $team->leader->name,
+            'members' => $team->members,
         ];
 
         return $this->success('Succeed get detail team.', ['team' => $teamResponse]);

@@ -13,9 +13,9 @@ class PublicMediaPartnerController extends Controller
             ->orderBy('name')
             ->get()
             ->map(fn (MediaPartner $partner) => [
-                'id'        => $partner->id,
-                'name'      => $partner->name,
-                'image'     => $partner->image,
+                'id' => $partner->id,
+                'name' => $partner->name,
+                'image' => $partner->image,
                 'createdAt' => $partner->created_at->toIso8601String(),
             ]);
 

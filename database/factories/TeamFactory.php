@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Competition;
 use App\Models\Team;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -23,8 +25,8 @@ class TeamFactory extends Factory
             'code' => fake()->bothify('??##??##'),
             'avatar' => fake()->imageUrl,
             'submission' => fake()->imageUrl,
-            'leader_id' => \App\Models\User::factory(),
-            'competition_id' => \App\Models\Competition::factory(),
+            'leader_id' => User::factory(),
+            'competition_id' => Competition::factory(),
         ];
     }
 }

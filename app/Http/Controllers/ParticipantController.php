@@ -15,6 +15,7 @@ class ParticipantController extends Controller
     public function show(): JsonResponse
     {
         $user = User::with('participant')->findOrFail(auth()->id());
+
         return $this->success('Succeed get detail user profile', ['user' => $user]);
     }
 
@@ -23,25 +24,25 @@ class ParticipantController extends Controller
         $user = auth()->user();
 
         $userData = [
-            'name'  => $request->input('fullName'),
+            'name' => $request->input('fullName'),
             'phone' => $request->input('phone'),
         ];
         $user->update($userData);
 
         $profileData = [
-            'grade'             => $request->input('grade', Grade::STUDENT),
-            'institution'       => $request->input('institution'),
+            'grade' => $request->input('grade', Grade::STUDENT),
+            'institution' => $request->input('institution'),
             'student_id_number' => $request->input('studentId') ?? $request->input('student_id_number') ?? $request->input('student_id'),
-            'gender'            => $request->input('gender'),
+            'gender' => $request->input('gender'),
         ];
-        
+
         if ($request->file('avatar') !== null) {
             $ext = $request->file('avatar')->getClientOriginalExtension();
             $fileName = $user->name.'-'.$user->email.'-'.Carbon::now()->timestamp.'.'.$ext;
             $avatar = $request->file('avatar')->storeAs('participant/avatar', $fileName, ['disk' => 'public']);
             $profileData['avatar'] = Storage::disk('public')->url($avatar);
         }
-        
+
         if ($request->file('photoIdentity') !== null) {
             $ext = $request->file('photoIdentity')->getClientOriginalExtension();
             $fileName = $user->name.'-'.$user->email.'-'.Carbon::now()->timestamp.'.'.$ext;
@@ -49,14 +50,14 @@ class ParticipantController extends Controller
                 ->storeAs('participant/photo-identity', $fileName, ['disk' => 'public']);
             $profileData['photo_identity'] = Storage::disk('public')->url($photoIdentity);
         }
-        
+
         if ($request->file('twibbon') !== null) {
             $ext = $request->file('twibbon')->getClientOriginalExtension();
             $fileName = $user->name.'-'.$user->email.'-'.Carbon::now()->timestamp.'.'.$ext;
             $twibbon = $request->file('twibbon')->storeAs('participant/twibbon', $fileName, ['disk' => 'public']);
             $profileData['twibbon'] = Storage::disk('public')->url($twibbon);
         }
-        
+
         $participant = Participant::query()->where('user_id', $user->id)->first();
         $detail = [];
         if ($participant === null) {
@@ -68,7 +69,7 @@ class ParticipantController extends Controller
         }
 
         return $this->success('Succeed update user profile', [
-            'user'   => $user,
+            'user' => $user,
             'detail' => $detail,
         ]);
     }
