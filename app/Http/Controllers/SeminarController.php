@@ -213,7 +213,7 @@ class SeminarController extends Controller
                 ? Storage::disk('public')->url($registration->certificate_path)
                 : null,
             'winnerStatus' => $winner
-                ? "{$winner->award_title} (Rank {$winner->rank})"
+                ? "{$winner->award_title}"
                 : $participantLabel,
         ]);
     }

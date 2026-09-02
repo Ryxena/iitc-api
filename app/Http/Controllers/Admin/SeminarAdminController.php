@@ -251,7 +251,7 @@ class SeminarAdminController extends Controller
 
         $request->validate([
             'user_id' => 'required|string|uuid|exists:users,id',
-            'certificate' => 'required|file|mimes:jpg,jpeg,png,pdf|max:5120',
+            'certificate' => 'required|file|mimes:jpg,jpeg,png,pdf|max:30720',
         ]);
 
         $registration = SeminarRegistration::query()->where('user_id', $request->user_id)->firstOrCreate(['user_id' => $request->user_id]);
