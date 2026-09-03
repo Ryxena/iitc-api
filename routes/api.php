@@ -23,6 +23,7 @@ use App\Http\Controllers\PaymentStatusController;
 use App\Http\Controllers\PublicMediaPartnerController;
 use App\Http\Controllers\PublicSeminarController;
 use App\Http\Controllers\PublicSponsorController;
+use App\Http\Controllers\PublicLegacyWinnerController;
 use App\Http\Controllers\PublicWinnerController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\SeminarController;
@@ -64,6 +65,7 @@ Route::get('/seminars/{id}', [PublicSeminarController::class, 'show']);
 
 // Winners (public read)
 Route::get('/winners', [PublicWinnerController::class, 'index']);
+Route::get('/legacy-winners', [PublicLegacyWinnerController::class, 'index']);
 
 // Sponsors (public read, sorted by tier)
 Route::get('/sponsors', PublicSponsorController::class);

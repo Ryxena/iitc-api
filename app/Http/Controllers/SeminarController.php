@@ -208,12 +208,13 @@ class SeminarController extends Controller
             'teamId' => $team->id,
             'teamName' => $team->name,
             'competitionName' => $team->competition?->name,
+            'paymentStatus' => $paymentStatus,
             'certificateNumber' => $registration->certificate_number,
             'certificateUrl' => $registration->certificate_path
                 ? Storage::disk('public')->url($registration->certificate_path)
                 : null,
             'winnerStatus' => $winner
-                ? "{$winner->award_title}"
+                ? $winner->award_title
                 : $participantLabel,
         ]);
     }

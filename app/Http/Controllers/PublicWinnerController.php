@@ -50,6 +50,8 @@ class PublicWinnerController extends Controller
                 $winnersData[] = [
                     'rank' => $team->winner->rank,
                     'awardTitle' => $team->winner->award_title,
+                    'projectName' => $team->winner->project_name,
+                    'projectDescription' => $team->winner->project_description,
                     'team' => [
                         'code' => $team->code,
                         'name' => $team->name,

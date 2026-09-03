@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\AdminSponsorController;
 use App\Http\Controllers\Admin\AdminTeamManagementController;
 use App\Http\Controllers\Admin\AdminTeamRecapController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminLegacyWinnerController;
 use App\Http\Controllers\Admin\AdminWinnerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportController as AdminExportController;
@@ -116,6 +117,12 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/winners', [AdminWinnerController::class, 'index'])->name('winners.index');
         Route::post('/winners', [AdminWinnerController::class, 'store'])->name('winners.store');
         Route::delete('/winners/{teamId}', [AdminWinnerController::class, 'destroy'])->name('winners.destroy');
+
+        // Legacy Winners
+        Route::get('/legacy-winners', [AdminLegacyWinnerController::class, 'index'])->name('legacy-winners.index');
+        Route::post('/legacy-winners', [AdminLegacyWinnerController::class, 'store'])->name('legacy-winners.store');
+        Route::post('/legacy-winners/{legacyWinner}', [AdminLegacyWinnerController::class, 'update'])->name('legacy-winners.update');
+        Route::delete('/legacy-winners/{legacyWinner}', [AdminLegacyWinnerController::class, 'destroy'])->name('legacy-winners.destroy');
     });
 });
 

@@ -19,11 +19,18 @@ class WinnerController extends Controller
             'team_id' => 'required|exists:teams,id',
             'rank' => 'required|integer',
             'award_title' => 'required|string',
+            'project_name' => 'nullable|string|max:255',
+            'project_description' => 'nullable|string',
         ]);
 
         $winner = Winner::updateOrCreate(
             ['team_id' => $request->team_id],
-            ['rank' => $request->rank, 'award_title' => $request->award_title]
+            [
+                'rank' => $request->rank,
+                'award_title' => $request->award_title,
+                'project_name' => $request->project_name,
+                'project_description' => $request->project_description,
+            ]
         );
 
         return $this->success('Berhasil menyimpan data juara', $winner);

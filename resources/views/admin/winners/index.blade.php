@@ -53,7 +53,9 @@
                                                             'team_id' => $team->id,
                                                             'team_name' => $team->name,
                                                             'rank' => $team->winner->rank ?? '',
-                                                            'award_title' => $team->winner->award_title ?? ''
+                                                            'award_title' => $team->winner->award_title ?? '',
+                                                            'project_name' => $team->winner->project_name ?? '',
+                                                            'project_description' => $team->winner->project_description ?? ''
                                                         ]) }})">
                                                     @if($team->winner) Edit Juara @else Set Juara @endif
                                                 </button>
@@ -104,6 +106,16 @@
                     <input type="text" name="award_title" id="input-award-title" class="form-input w-full" placeholder="Juara 1 / Harapan 1" required>
                 </div>
 
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-main mb-1">Nama Proyek</label>
+                    <input type="text" name="project_name" id="input-project-name" class="form-input w-full" placeholder="e.g. Aplikasi IoT Smart Farming">
+                </div>
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-main mb-1">Deskripsi Proyek</label>
+                    <textarea name="project_description" id="input-project-desc" class="form-input w-full" rows="3" placeholder="Deskripsi singkat proyek..."></textarea>
+                </div>
+
                 <div class="flex justify-end gap-3 mt-6">
                     <button type="button" onclick="closeModal('modal-winner')" class="btn-ghost">Batal</button>
                     <button type="submit" class="btn-primary">Simpan</button>
@@ -118,6 +130,8 @@
             document.getElementById('input-team-id').value = data.team_id;
             document.getElementById('input-rank').value = data.rank;
             document.getElementById('input-award-title').value = data.award_title;
+            document.getElementById('input-project-name').value = data.project_name ?? '';
+            document.getElementById('input-project-desc').value = data.project_description ?? '';
             
             document.getElementById('modal-winner').style.display = 'block';
             document.body.style.overflow = 'hidden';
