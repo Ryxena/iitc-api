@@ -9,6 +9,7 @@ use App\Models\Setting;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class CertificateNumberService
 {
@@ -98,10 +99,27 @@ class CertificateNumberService
     }
 
     /**
+     * Stable roster ordering for numbering and listing: competition name,
+     * then finalists by champion rank, then participants, oldest team first.
+     *
+     * @return array<int|string>
+     */
+    public function orderingKey(CertificateNumber $row): array
+    {
+        return [
+            Str::lower($row->team?->competition?->name ?? ''),
+            $row->type === CertificateNumber::TYPE_FINALIST ? 0 : 1,
+            (int) ($row->team?->winner?->rank ?? PHP_INT_MAX),
+            (int) $row->team_id,
+            (int) $row->id,
+        ];
+    }
+
+    /**
      * Assign sequences to every unassigned row of the event, filling the
      * smallest free numbers from the configured start (gaps left by deleted
      * rows are reused; numbers already taken — including manual overrides —
-     * are skipped).
+     * are skipped). Rows are numbered in roster order.
      *
      * @return int number of rows assigned
      */
@@ -112,8 +130,10 @@ class CertificateNumberService
         foreach ([CertificateNumber::TYPE_FINALIST, CertificateNumber::TYPE_PARTICIPANT] as $type) {
             $rows = $this->rowsQuery($event, $type)
                 ->whereNull('sequence')
-                ->orderBy('id')
-                ->get();
+                ->with(['team.competition', 'team.winner'])
+                ->get()
+                ->sortBy(fn (CertificateNumber $r) => $this->orderingKey($r))
+                ->values();
 
             if ($rows->isEmpty()) {
                 continue;
@@ -166,7 +186,11 @@ class CertificateNumberService
      */
     public function renumber(Event $event, string $type): int
     {
-        $rows = $this->rowsQuery($event, $type)->orderBy('id')->get();
+        $rows = $this->rowsQuery($event, $type)
+            ->with(['team.competition', 'team.winner'])
+            ->get()
+            ->sortBy(fn (CertificateNumber $r) => $this->orderingKey($r))
+            ->values();
 
         $next = $this->start($event, $type);
 

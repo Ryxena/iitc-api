@@ -8,7 +8,6 @@ use App\Models\Event;
 use App\Services\CertificateNumberService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Illuminate\View\View;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -35,14 +34,10 @@ class AdminCertificateController extends Controller
                 ->with(['user.participant', 'team.competition', 'team.winner'])
                 ->whereHas('team.competition', fn ($q) => $q->where('event_id', $event->id))
                 ->get()
-                // Urut: nama kompetisi → finalis (rank 1,2,3,…) → partisipan → nomor.
+                // Urut sesuai nomor sertifikat; yang belum bernomor di akhir.
                 ->sortBy(fn (CertificateNumber $r) => [
-                    Str::lower($r->team?->competition?->name ?? ''),
-                    $r->type === CertificateNumber::TYPE_FINALIST ? 0 : 1,
-                    (int) ($r->team?->winner?->rank ?? PHP_INT_MAX),
-                    $r->team_id,
                     $r->sequence ?? PHP_INT_MAX,
-                    $r->id,
+                    ...$this->numbers->orderingKey($r),
                 ])
                 ->values();
 
