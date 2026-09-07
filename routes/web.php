@@ -123,6 +123,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/certificates', [AdminCertificateController::class, 'index'])->name('certificates.index');
         Route::put('/certificates/settings', [AdminCertificateController::class, 'updateSettings'])->name('certificates.settings');
         Route::post('/certificates/generate', [AdminCertificateController::class, 'generate'])->name('certificates.generate');
+        Route::post('/certificates/renumber', [AdminCertificateController::class, 'renumber'])->name('certificates.renumber');
         Route::patch('/certificates/{certificateNumber}', [AdminCertificateController::class, 'updateNumber'])->name('certificates.update-number');
         Route::get('/certificates/export', [AdminCertificateController::class, 'export'])->name('certificates.export');
 

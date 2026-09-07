@@ -85,7 +85,23 @@
                 Export CSV
             </a>
 
-            <p class="text-xs text-muted">Generate mengisi roster tim VALID (finalis = tim juara, partisipan = sisanya) lalu menomori yang belum punya nomor. Nomor yang sudah ada / hasil override tidak berubah.</p>
+            <form method="POST" action="{{ route('admin.certificates.renumber') }}"
+                  onsubmit="return confirm('Urutkan ulang SEMUA nomor finalis (D) dari angka awal? Nomor lama &amp; override manual akan diganti.');">
+                @csrf
+                <input type="hidden" name="event_id" value="{{ $event->id }}">
+                <input type="hidden" name="type" value="D">
+                <button type="submit" class="btn-danger">Nomor Ulang Finalis (D)</button>
+            </form>
+
+            <form method="POST" action="{{ route('admin.certificates.renumber') }}"
+                  onsubmit="return confirm('Urutkan ulang SEMUA nomor partisipan (F) dari angka awal? Nomor lama &amp; override manual akan diganti.');">
+                @csrf
+                <input type="hidden" name="event_id" value="{{ $event->id }}">
+                <input type="hidden" name="type" value="F">
+                <button type="submit" class="btn-danger">Nomor Ulang Partisipan (F)</button>
+            </form>
+
+            <p class="text-xs text-muted">Generate mengisi roster tim VALID (finalis = tim juara, partisipan = sisanya) lalu menomori yang belum punya nomor. Nomor yang sudah ada / hasil override tidak berubah. Tombol <strong>Nomor Ulang</strong> menata ulang seluruh nomor satu tipe mulai dari angka awal saat ini — gunakan setelah testing atau jika ada nomor bolong.</p>
         </div>
 
         {{-- TABEL --}}

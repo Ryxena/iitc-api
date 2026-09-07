@@ -104,6 +104,24 @@ class AdminCertificateController extends Controller
     }
 
     /**
+     * Renumber every row of one type from its configured start.
+     */
+    public function renumber(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'event_id' => 'required|exists:events,id',
+            'type' => 'required|in:D,F',
+        ]);
+
+        $event = Event::findOrFail($data['event_id']);
+        $count = $this->numbers->renumber($event, $data['type']);
+
+        $label = $data['type'] === CertificateNumber::TYPE_FINALIST ? 'finalis (D)' : 'partisipan (F)';
+
+        return redirect()->back()->with('success', "Nomor {$label} diurutkan ulang: {$count} orang.");
+    }
+
+    /**
      * Override the number of a single person.
      */
     public function updateNumber(Request $request, CertificateNumber $certificateNumber): RedirectResponse

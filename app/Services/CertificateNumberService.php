@@ -158,6 +158,26 @@ class CertificateNumberService
     }
 
     /**
+     * Reassign every row of an event + type sequentially from the
+     * configured start, in roster order. Existing (and manually
+     * overridden) numbers are replaced.
+     *
+     * @return int number of rows renumbered
+     */
+    public function renumber(Event $event, string $type): int
+    {
+        $rows = $this->rowsQuery($event, $type)->orderBy('id')->get();
+
+        $next = $this->start($event, $type);
+
+        foreach ($rows as $row) {
+            $row->update(['sequence' => $next++]);
+        }
+
+        return $rows->count();
+    }
+
+    /**
      * Full certificate number for a row, e.g. "055/D/SRT-IITC/INTERMEDIA/IX/2026".
      * Returns null while the row has no sequence yet.
      */
