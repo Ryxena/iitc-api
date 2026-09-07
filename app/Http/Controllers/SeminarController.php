@@ -193,18 +193,27 @@ class SeminarController extends Controller
             return $this->error('Cannot create certificate because payment is not done yet / not valid', 403);
         }
 
-        // Create registration if not exists, then generate number
+        // Create registration if not exists, then resolve the official number
         $registration = SeminarRegistration::query()->firstOrCreate(
             ['user_id' => $user->id],
             ['attended' => true],
         );
 
-        // Prefer the official certificate number (D/F) maintained in the
-        // admin panel; fall back to the legacy seminar number.
-        $certificateNumber = $this->numbers->numberFor($user, $team)
-            ?? $registration->certificate_number;
+        // Official certificate number (D/F) only — the legacy IITC-2026-XXXX
+        // format is never used. When the event has not been numbered yet,
+        // build the roster and assign numbers on the spot.
+        $certificateNumber = $this->numbers->numberFor($user, $team);
 
-        if (! $registration->certificate_number && $certificateNumber) {
+        if ($certificateNumber === null) {
+            $this->numbers->syncTeam($team);
+            $certificateNumber = $this->numbers->numberFor($user, $team);
+        }
+
+        if ($certificateNumber === null) {
+            return $this->error('Certificate number is not available for this event yet.', 409);
+        }
+
+        if (! $registration->certificate_number) {
             $registration->update(['certificate_number' => $certificateNumber]);
             $registration->refresh();
         }
