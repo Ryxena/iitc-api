@@ -3,12 +3,16 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Team;
 use App\Models\Winner;
+use App\Services\CertificateNumberService;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class WinnerController extends Controller
 {
+    public function __construct(private readonly CertificateNumberService $numbers) {}
+
     public function store(Request $request)
     {
         if (! auth()->user()->hasRole('Super Admin')) {
@@ -33,6 +37,8 @@ class WinnerController extends Controller
             ]
         );
 
+        $this->numbers->syncTeam(Team::with('competition.event')->find($request->team_id));
+
         return $this->success('Berhasil menyimpan data juara', $winner);
     }
 
@@ -42,7 +48,13 @@ class WinnerController extends Controller
             throw new AccessDeniedHttpException('unauthorize');
         }
 
+        $team = Team::with('competition.event')->find($teamId);
+
         Winner::where('team_id', $teamId)->delete();
+
+        if ($team) {
+            $this->numbers->syncTeam($team);
+        }
 
         return $this->success('Berhasil menghapus data juara', null);
     }

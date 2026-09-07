@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminCertificateController;
 use App\Http\Controllers\Admin\AdminCompetitionController;
+use App\Http\Controllers\Admin\AdminLegacyWinnerController;
 use App\Http\Controllers\Admin\AdminMediaPartnerController;
 use App\Http\Controllers\Admin\AdminParticipantRecapController;
 use App\Http\Controllers\Admin\AdminSeminarManagementController;
@@ -8,7 +10,6 @@ use App\Http\Controllers\Admin\AdminSponsorController;
 use App\Http\Controllers\Admin\AdminTeamManagementController;
 use App\Http\Controllers\Admin\AdminTeamRecapController;
 use App\Http\Controllers\Admin\AdminUserController;
-use App\Http\Controllers\Admin\AdminLegacyWinnerController;
 use App\Http\Controllers\Admin\AdminWinnerController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboardController;
 use App\Http\Controllers\Admin\ExportController as AdminExportController;
@@ -117,6 +118,13 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::get('/winners', [AdminWinnerController::class, 'index'])->name('winners.index');
         Route::post('/winners', [AdminWinnerController::class, 'store'])->name('winners.store');
         Route::delete('/winners/{teamId}', [AdminWinnerController::class, 'destroy'])->name('winners.destroy');
+
+        // Certificate numbers (finalist D / participant F)
+        Route::get('/certificates', [AdminCertificateController::class, 'index'])->name('certificates.index');
+        Route::put('/certificates/settings', [AdminCertificateController::class, 'updateSettings'])->name('certificates.settings');
+        Route::post('/certificates/generate', [AdminCertificateController::class, 'generate'])->name('certificates.generate');
+        Route::patch('/certificates/{certificateNumber}', [AdminCertificateController::class, 'updateNumber'])->name('certificates.update-number');
+        Route::get('/certificates/export', [AdminCertificateController::class, 'export'])->name('certificates.export');
 
         // Legacy Winners
         Route::get('/legacy-winners', [AdminLegacyWinnerController::class, 'index'])->name('legacy-winners.index');

@@ -7,6 +7,7 @@ use App\Models\SeminarRegistration;
 use App\Models\Setting;
 use App\Models\User;
 use App\Models\Winner;
+use App\Services\CertificateNumberService;
 use App\Services\CertificateService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
@@ -17,7 +18,10 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class SeminarAdminController extends Controller
 {
-    public function __construct(private CertificateService $certificateService) {}
+    public function __construct(
+        private CertificateService $certificateService,
+        private CertificateNumberService $numbers,
+    ) {}
 
     public function index(Request $request): View
     {
@@ -147,8 +151,10 @@ class SeminarAdminController extends Controller
 
         $path = $request->file('certificate')->store('seminar-certificates', 'public');
 
-        $certificateNumber = $registration->certificate_number
-            ?? app(CertificateService::class)->generateCertificateNumber();
+        $official = $this->numbers->numberForUser($registration->user);
+        $certificateNumber = $official
+            ?? $registration->certificate_number
+            ?? $this->certificateService->generateCertificateNumber();
 
         $registration->update([
             'certificate_path' => $path,
@@ -207,6 +213,10 @@ class SeminarAdminController extends Controller
             }
         }
 
+        $officialNumbers = $this->numbers->numbersForTeams(
+            $rows->pluck('team')->filter()->pluck('id')->all()
+        );
+
         $totalCount = Winner::count();
         $withCertificateCount = SeminarRegistration::query()
             ->whereNotNull('certificate_path')
@@ -227,6 +237,7 @@ class SeminarAdminController extends Controller
             'totalCount',
             'withCertificateCount',
             'nonWinnerLabel',
+            'officialNumbers',
         ));
     }
 
@@ -251,25 +262,28 @@ class SeminarAdminController extends Controller
 
         $request->validate([
             'user_id' => 'required|string|uuid|exists:users,id',
-            'certificate' => 'required|file|mimes:jpg,jpeg,png,pdf|max:30720',
+            'team_id' => 'nullable|integer|exists:teams,id',
+            'certificate_number' => 'required|string|max:255',
+            'certificate' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:30720',
         ]);
 
         $registration = SeminarRegistration::query()->where('user_id', $request->user_id)->firstOrCreate(['user_id' => $request->user_id]);
 
-        if ($registration->certificate_path) {
-            Storage::disk('public')->delete($registration->certificate_path);
+        if ($request->hasFile('certificate')) {
+            if ($registration->certificate_path) {
+                Storage::disk('public')->delete($registration->certificate_path);
+            }
+
+            $path = $request->file('certificate')->store('seminar-certificates', 'public');
+        } else {
+            $path = $registration->certificate_path;
         }
-
-        $path = $request->file('certificate')->store('seminar-certificates', 'public');
-
-        $certificateNumber = $registration->certificate_number
-            ?? app(CertificateService::class)->generateCertificateNumber();
 
         $registration->update([
             'certificate_path' => $path,
-            'certificate_number' => $certificateNumber,
+            'certificate_number' => $request->certificate_number,
         ]);
 
-        return redirect()->back()->with('success', 'Sertifikat berhasil diupload.');
+        return redirect()->back()->with('success', 'Sertifikat berhasil disimpan.');
     }
 }

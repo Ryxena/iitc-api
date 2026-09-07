@@ -95,6 +95,10 @@
                                 </span>
                             </td>
                             <td style="border-right: none;">
+                            @php
+                                // Nomor resmi live dari halaman Nomor Sertifikat; fallback ke kolom lama.
+                                $officialNumber = $officialNumbers[$user?->id.'|'.$team?->id] ?? $reg?->certificate_number;
+                            @endphp
                                 @if($reg && $reg->certificate_path)
                                     <span class="badge badge-valid flex items-center gap-1" style="width: fit-content;">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -102,17 +106,17 @@
                                         </svg>
                                         File
                                     </span>
-                                    @if($reg->certificate_number)
-                                        <p class="text-xs text-muted mt-1">{{ $reg->certificate_number }}</p>
+                                    @if($officialNumber)
+                                        <p class="text-xs text-muted mt-1">{{ $officialNumber }}</p>
                                     @endif
-                                @elseif($reg && $reg->certificate_number)
+                                @elseif($officialNumber)
                                     <span class="badge badge-info flex items-center gap-1" style="width: fit-content;">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
                                         </svg>
                                         No. Sertifikat
                                     </span>
-                                    <p class="text-xs text-muted mt-1">{{ $reg->certificate_number }}</p>
+                                    <p class="text-xs text-muted mt-1">{{ $officialNumber }}</p>
                                 @else
                                     <span class="text-sm text-muted">—</span>
                                 @endif
@@ -126,7 +130,7 @@
                                         </a>
                                     @endif
                                     @if($user)
-                                        <button onclick="openUploadModal('{{ $user->id }}', '{{ addslashes($user->name ?? '') }}')"
+                                        <button onclick="openUploadModal('{{ $user->id }}', '{{ addslashes($user->name ?? '') }}', '{{ addslashes($team?->id ?? '') }}', '{{ addslashes($officialNumber ?? '') }}')"
                                                 class="btn-primary" style="padding: 4px 12px; font-size: 12px;">
                                             Upload
                                         </button>
@@ -162,25 +166,34 @@
             <form id="form-upload" method="POST" action="{{ route('admin.seminar.certificates.upload') }}" enctype="multipart/form-data">
                 @csrf
                 <input type="hidden" name="user_id" id="upload-user-id">
+                <input type="hidden" name="team_id" id="upload-team-id">
                 <p class="text-sm text-muted mb-4">Upload untuk: <strong id="upload-user-name" class="text-main"></strong></p>
                 <div class="mb-4">
-                    <label class="text-sm font-medium text-muted block mb-1">File Sertifikat</label>
-                    <input type="file" name="certificate" accept=".jpg,.jpeg,.png,.pdf" required
+                    <label class="text-sm font-medium text-muted block mb-1">Nomor Sertifikat <span style="color:#DC2626">*</span></label>
+                    <input type="text" name="certificate_number" id="upload-cert-number" required class="form-input" style="padding: 8px 12px; width: 100%;"
+                           placeholder="055/D/SRT-IITC/INTERMEDIA/IX/2026">
+                    <p class="text-xs text-muted mt-1">Terisi otomatis dari nomor resmi di halaman Nomor Sertifikat. Bisa diubah bila perlu.</p>
+                </div>
+                <div class="mb-4">
+                    <label class="text-sm font-medium text-muted block mb-1">File Sertifikat (opsional)</label>
+                    <input type="file" name="certificate" accept=".jpg,.jpeg,.png,.pdf"
                            class="form-input" style="padding: 8px 12px; width: 100%;">
-                    <p class="text-xs text-muted mt-1">Format: JPG, PNG, PDF. Maks 5 MB.</p>
+                    <p class="text-xs text-muted mt-1">Format: JPG, PNG, PDF. Maks 30 MB. Kosongkan jika hanya memperbaiki nomor.</p>
                 </div>
                 <div class="flex items-center gap-3 justify-end">
                     <button type="button" onclick="closeUploadModal()" class="btn-ghost" style="padding: 8px 16px;">Batal</button>
-                    <button type="submit" class="btn-primary" style="padding: 8px 16px;">Upload</button>
+                    <button type="submit" class="btn-primary" style="padding: 8px 16px;">Simpan</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        function openUploadModal(userId, userName) {
+        function openUploadModal(userId, userName, teamId, officialNumber) {
             document.getElementById('upload-user-id').value = userId;
+            document.getElementById('upload-team-id').value = teamId || '';
             document.getElementById('upload-user-name').textContent = userName;
+            document.getElementById('upload-cert-number').value = officialNumber || '';
             document.getElementById('upload-modal').style.display = 'flex';
         }
         function closeUploadModal() {

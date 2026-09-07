@@ -7,6 +7,7 @@ use App\Models\Seminar;
 use App\Models\SeminarRegistration;
 use App\Models\Setting;
 use App\Models\User;
+use App\Services\CertificateNumberService;
 use App\Services\CertificateService;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
@@ -15,7 +16,10 @@ use Illuminate\Support\Facades\Storage;
 
 class SeminarController extends Controller
 {
-    public function __construct(private CertificateService $certificateService) {}
+    public function __construct(
+        private CertificateService $certificateService,
+        private CertificateNumberService $numbers,
+    ) {}
 
     /**
      * [ADMIN] List all registered seminar participants.
@@ -195,9 +199,13 @@ class SeminarController extends Controller
             ['attended' => true],
         );
 
-        if (! $registration->certificate_number) {
-            $number = $this->certificateService->generateCertificateNumber();
-            $registration->update(['certificate_number' => $number]);
+        // Prefer the official certificate number (D/F) maintained in the
+        // admin panel; fall back to the legacy seminar number.
+        $certificateNumber = $this->numbers->numberFor($user, $team)
+            ?? $registration->certificate_number;
+
+        if (! $registration->certificate_number && $certificateNumber) {
+            $registration->update(['certificate_number' => $certificateNumber]);
             $registration->refresh();
         }
 
@@ -209,7 +217,7 @@ class SeminarController extends Controller
             'teamName' => $team->name,
             'competitionName' => $team->competition?->name,
             'paymentStatus' => $paymentStatus,
-            'certificateNumber' => $registration->certificate_number,
+            'certificateNumber' => $certificateNumber,
             'certificateUrl' => $registration->certificate_path
                 ? Storage::disk('public')->url($registration->certificate_path)
                 : null,
