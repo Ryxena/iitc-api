@@ -98,8 +98,10 @@ class CertificateNumberService
     }
 
     /**
-     * Assign sequences to every unassigned row of the event, continuing
-     * from the highest number already in use (or the configured start).
+     * Assign sequences to every unassigned row of the event, filling the
+     * smallest free numbers from the configured start (gaps left by deleted
+     * rows are reused; numbers already taken — including manual overrides —
+     * are skipped).
      *
      * @return int number of rows assigned
      */
@@ -117,10 +119,20 @@ class CertificateNumberService
                 continue;
             }
 
-            $next = $this->nextSequence($event, $type);
+            $used = array_flip(
+                $this->rowsQuery($event, $type)->whereNotNull('sequence')->pluck('sequence')->all()
+            );
+
+            $candidate = $this->start($event, $type);
 
             foreach ($rows as $row) {
-                $row->update(['sequence' => $next++]);
+                while (isset($used[$candidate])) {
+                    $candidate++;
+                }
+
+                $row->update(['sequence' => $candidate]);
+                $used[$candidate] = true;
+                $candidate++;
                 $assigned++;
             }
         }
@@ -253,16 +265,6 @@ class CertificateNumberService
         return CertificateNumber::query()
             ->where('type', $type)
             ->whereHas('team.competition', fn ($q) => $q->where('event_id', $event->id));
-    }
-
-    /**
-     * First free sequence for an event + type.
-     */
-    private function nextSequence(Event $event, string $type): int
-    {
-        $max = (int) $this->rowsQuery($event, $type)->whereNotNull('sequence')->max('sequence');
-
-        return $max > 0 ? $max + 1 : $this->start($event, $type);
     }
 
     /**
