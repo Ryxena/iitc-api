@@ -182,10 +182,10 @@ class SeminarController extends Controller
         }
 
         // Check registration deadline — team created before deadline is eligible
-        $deadline = Carbon::parse($team->competition->deadline);
-        if ($team->created_at->gt($deadline)) {
-            return $this->error('Cannot create certificate because registration is closed', 403);
-        }
+        // $deadline = Carbon::parse($team->competition->deadline);
+        // if ($team->created_at->gt($deadline)) {
+        //     return $this->error('Cannot create certificate because registration is closed', 403);
+        // }
 
         // Check payment status
         $paymentStatus = $team->paymentStatus->status ?? null;
